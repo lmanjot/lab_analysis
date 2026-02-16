@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { GoogleAuth } from 'google-auth-library'
+import { JWT } from 'google-auth-library'
 
 const MODEL = 'gemini-2.0-flash'
 const ALLOWED_DOMAIN = 'mara.care'
@@ -45,19 +45,24 @@ function isEmailAllowed(email: string): boolean {
   return email.endsWith('@' + normalizedDomain)
 }
 
+const VERTEX_SCOPE = 'https://www.googleapis.com/auth/cloud-platform'
+
 async function getVertexAccessToken(): Promise<string> {
   const raw = process.env.VERTEX_SERVICE_ACCOUNT_JSON
   if (!raw) {
     throw new Error('VERTEX_SERVICE_ACCOUNT_JSON is not set')
   }
   const credentials = JSON.parse(raw) as { client_email: string; private_key: string }
-  const auth = new GoogleAuth({ credentials })
-  const client = await auth.getClient()
-  const tokenResponse = await client.getAccessToken()
-  if (!tokenResponse.token) {
+  const client = new JWT({
+    email: credentials.client_email,
+    key: credentials.private_key,
+    scopes: [VERTEX_SCOPE],
+  })
+  const tokens = await client.authorize()
+  if (!tokens?.access_token) {
     throw new Error('Failed to obtain Vertex AI access token')
   }
-  return tokenResponse.token
+  return tokens.access_token
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
