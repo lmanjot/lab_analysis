@@ -37,6 +37,8 @@ interface TokenClient {
   requestAccessToken(overrideConfig?: { prompt?: string }): void
 }
 
+const STORAGE_KEY = 'lab_analysis_auth'
+
 let tokenClient: TokenClient | null = null
 let onAuthChange: ((state: AuthState) => void) | null = null
 let authInitError: string | null = null
@@ -58,6 +60,30 @@ function createEmptyAuthState(): AuthState {
     name: null,
     expiresAt: null,
   }
+}
+
+function saveAuthToStorage(state: AuthState): void {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  } catch { /* storage full or unavailable */ }
+}
+
+function loadAuthFromStorage(): AuthState | null {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    const state: AuthState = JSON.parse(raw)
+    if (!state.isSignedIn || !state.accessToken) return null
+    return state
+  } catch {
+    return null
+  }
+}
+
+function clearAuthStorage(): void {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY)
+  } catch { /* ignore */ }
 }
 
 async function fetchUserInfo(accessToken: string): Promise<{ email: string; name: string }> {
@@ -126,10 +152,23 @@ export function getGoogleLocation(): string {
   return 'us-central1'
 }
 
+function applyAuthState(state: AuthState): void {
+  saveAuthToStorage(state)
+  lastEmail = state.email
+  onAuthChange?.(state)
+}
+
 export function initAuth(callback: (state: AuthState) => void): void {
   onAuthChange = callback
   authInitError = null
   authReady = false
+
+  // Restore session from storage immediately (avoids flash of signed-out UI)
+  const stored = loadAuthFromStorage()
+  if (stored && stored.expiresAt && Date.now() < stored.expiresAt - 60000) {
+    lastEmail = stored.email
+    callback(stored)
+  }
 
   const clientId = getClientId()
   if (!clientId) {
@@ -146,30 +185,28 @@ export function initAuth(callback: (state: AuthState) => void): void {
         callback: async (response: TokenResponse) => {
           if (response.error) {
             console.error('OAuth error:', response.error)
+            clearAuthStorage()
             onAuthChange?.(createEmptyAuthState())
             return
           }
 
           try {
             const userInfo = await fetchUserInfo(response.access_token)
-            lastEmail = userInfo.email
-            const state: AuthState = {
+            applyAuthState({
               isSignedIn: true,
               accessToken: response.access_token,
               email: userInfo.email,
               name: userInfo.name,
               expiresAt: Date.now() + response.expires_in * 1000,
-            }
-            onAuthChange?.(state)
+            })
           } catch {
-            const state: AuthState = {
+            applyAuthState({
               isSignedIn: true,
               accessToken: response.access_token,
-              email: null,
-              name: null,
+              email: stored?.email ?? null,
+              name: stored?.name ?? null,
               expiresAt: Date.now() + response.expires_in * 1000,
-            }
-            onAuthChange?.(state)
+            })
           }
         },
         error_callback: (error) => {
@@ -177,6 +214,11 @@ export function initAuth(callback: (state: AuthState) => void): void {
         },
       })
       authReady = true
+
+      // If we had a stored session but the token is expired, silently refresh
+      if (stored && stored.expiresAt && Date.now() >= stored.expiresAt - 60000) {
+        tokenClient.requestAccessToken({ prompt: '' })
+      }
     })
     .catch((err) => {
       authInitError = 'LOAD_FAILED'
@@ -201,13 +243,14 @@ export function signIn(): string | null {
 }
 
 export function signOut(): void {
+  clearAuthStorage()
   onAuthChange?.(createEmptyAuthState())
-  // Revoke the token so the next sign-in shows the account picker cleanly
   if (window.google?.accounts?.id) {
     try {
       window.google.accounts.id.revoke(lastEmail || '', () => {})
     } catch { /* ignore */ }
   }
+  lastEmail = null
 }
 
 export function isTokenExpired(auth: AuthState): boolean {
