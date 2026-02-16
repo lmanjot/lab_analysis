@@ -31,7 +31,7 @@ export default function App() {
     const status = getAuthStatus()
     if (status.error === 'MISSING_CLIENT_ID') {
       setAuthConfigError(
-        'Google OAuth is not configured. Create a .env file in the project root with:\nVITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com\nThen restart the dev server.'
+        'Google OAuth is not configured.\n\nOn Vercel: set goauthid in Environment Variables.\nFor local dev: create a .env file with VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com\nThen restart the dev server.'
       )
     }
   }, [])

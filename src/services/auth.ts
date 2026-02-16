@@ -95,15 +95,27 @@ function loadGisScript(): Promise<void> {
   })
 }
 
+function getClientId(): string {
+  // 1. Check Vercel env var (injected at build time via vite.config.ts define)
+  if (typeof __GOAUTHID__ !== 'undefined' && __GOAUTHID__) {
+    return __GOAUTHID__
+  }
+  // 2. Check .env file (VITE_-prefixed, for local development)
+  if (import.meta.env.VITE_GOOGLE_CLIENT_ID) {
+    return import.meta.env.VITE_GOOGLE_CLIENT_ID
+  }
+  return ''
+}
+
 export function initAuth(callback: (state: AuthState) => void): void {
   onAuthChange = callback
   authInitError = null
   authReady = false
 
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+  const clientId = getClientId()
   if (!clientId) {
     authInitError = 'MISSING_CLIENT_ID'
-    console.warn('VITE_GOOGLE_CLIENT_ID is not set. Create a .env file with your Google OAuth Client ID.')
+    console.warn('Google OAuth Client ID not found. Set goauthid in Vercel or VITE_GOOGLE_CLIENT_ID in .env')
     return
   }
 
@@ -158,7 +170,7 @@ export function getAuthStatus(): { ready: boolean; error: string | null } {
 
 export function signIn(): string | null {
   if (authInitError === 'MISSING_CLIENT_ID') {
-    return 'Google OAuth Client ID is not configured. Create a .env file with VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com'
+    return 'Google OAuth Client ID is not configured. Set goauthid in Vercel, or create a .env file with VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com'
   }
   if (!tokenClient) {
     return 'Google sign-in is still loading. Please try again in a moment.'
