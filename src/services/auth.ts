@@ -106,6 +106,26 @@ function getClientId(): string {
   return ''
 }
 
+export function getGoogleProjectId(): string {
+  if (typeof __GOPROJECTID__ !== 'undefined' && __GOPROJECTID__) {
+    return __GOPROJECTID__
+  }
+  if (import.meta.env.VITE_GOOGLE_PROJECT_ID) {
+    return import.meta.env.VITE_GOOGLE_PROJECT_ID
+  }
+  return ''
+}
+
+export function getGoogleLocation(): string {
+  if (typeof __GOLOCATION__ !== 'undefined' && __GOLOCATION__) {
+    return __GOLOCATION__
+  }
+  if (import.meta.env.VITE_GOOGLE_LOCATION) {
+    return import.meta.env.VITE_GOOGLE_LOCATION
+  }
+  return 'us-central1'
+}
+
 export function initAuth(callback: (state: AuthState) => void): void {
   onAuthChange = callback
   authInitError = null

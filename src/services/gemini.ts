@@ -1,7 +1,21 @@
 import { GeminiReport } from '../types'
+import { getGoogleProjectId, getGoogleLocation } from './auth'
 
-const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta'
-const MODEL = 'models/gemini-2.0-flash'
+const MODEL = 'gemini-2.0-flash'
+
+function getEndpointUrl(): string {
+  const projectId = getGoogleProjectId()
+  const location = getGoogleLocation()
+
+  if (!projectId) {
+    throw new Error(
+      'Google Cloud Project ID is not configured. Set goprojectid in Vercel, or VITE_GOOGLE_PROJECT_ID in .env'
+    )
+  }
+
+  // Vertex AI endpoint supports OAuth (generativelanguage.googleapis.com does not)
+  return `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${MODEL}`
+}
 
 interface GeminiPart {
   text?: string
@@ -49,7 +63,9 @@ export async function analyzeWithGemini(
     },
   }
 
-  const response = await fetch(`${GEMINI_API_BASE}/${MODEL}:generateContent`, {
+  const endpointUrl = getEndpointUrl()
+
+  const response = await fetch(`${endpointUrl}:generateContent`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
