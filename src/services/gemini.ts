@@ -111,9 +111,21 @@ function parseGeminiResponse(text: string): GeminiReport {
 
   try {
     const parsed = JSON.parse(cleaned)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const panels = Array.isArray(parsed.panels)
+      ? parsed.panels.map((panel: any) => ({
+          name: panel.name || '',
+          biomarkers: Array.isArray(panel.biomarkers)
+            ? panel.biomarkers.map((bio: any) => ({
+                ...bio,
+                hairStatus: bio.hairStatus || 'not_relevant',
+              }))
+            : [],
+        }))
+      : []
     return {
       summary: parsed.summary || '',
-      panels: Array.isArray(parsed.panels) ? parsed.panels : [],
+      panels,
       interpretation: parsed.interpretation || '',
       followUp: Array.isArray(parsed.followUp) ? parsed.followUp : [],
     }

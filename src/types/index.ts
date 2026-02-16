@@ -130,6 +130,8 @@ export interface GeminiReportPanel {
   biomarkers: GeminiReportBiomarker[]
 }
 
+export type HairStatus = 'optimal' | 'suboptimal' | 'concern' | 'not_relevant' | ''
+
 export interface GeminiReportBiomarker {
   code: string
   name: string
@@ -137,6 +139,7 @@ export interface GeminiReportBiomarker {
   units: string
   refRange: string
   status: 'normal' | 'low' | 'high' | 'critical_low' | 'critical_high'
+  hairStatus: HairStatus
   interpretation: string
 }
 
