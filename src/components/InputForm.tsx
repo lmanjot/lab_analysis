@@ -27,6 +27,7 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedH
   const [showPrompt, setShowPrompt] = useState(false)
   const [showHL7Input, setShowHL7Input] = useState(!preloadedHL7)
   const [showDebug, setShowDebug] = useState(false)
+  const [showMedicalForm, setShowMedicalForm] = useState(false)
   const [parsedPreview, setParsedPreview] = useState<ParsedHL7 | null>(null)
   const [parseError, setParseError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -261,7 +262,24 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedH
               </div>
             </div>
 
-            <PatientContext value={patientCtx} onChange={setPatientCtx} />
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowMedicalForm(!showMedicalForm)}
+                className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 mb-2"
+              >
+                <svg
+                  className={`w-4 h-4 text-gray-400 transition-transform ${showMedicalForm ? 'rotate-180' : ''}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+                {t('patient.title')}
+              </button>
+              {showMedicalForm && (
+                <PatientContext value={patientCtx} onChange={setPatientCtx} />
+              )}
+            </div>
 
             <div>
               <button
