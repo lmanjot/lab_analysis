@@ -88,3 +88,20 @@ export function isStatusAbnormal(raw: string): boolean {
   const n = normalizeStatus(raw)
   return n !== 'normal' && n !== 'unknown'
 }
+
+/** Row background class for abnormal statuses. */
+export function statusRowBg(raw: string): string {
+  const n = normalizeStatus(raw)
+  switch (n) {
+    case 'low':
+    case 'high':
+    case 'critical_low':
+    case 'critical_high':
+      return 'bg-red-50/60'
+    case 'suboptimal':
+    case 'supraoptimal':
+      return 'bg-yellow-50/60'
+    default:
+      return ''
+  }
+}

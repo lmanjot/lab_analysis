@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { ParsedHL7 } from '../types'
-import { normalizeStatus, statusColor, statusLabel } from '../services/statusUtils'
+import { normalizeStatus, statusColor, statusLabel, statusRowBg } from '../services/statusUtils'
 
 interface ParsePreviewProps {
   data: ParsedHL7
@@ -64,7 +64,7 @@ export default function ParsePreview({ data }: ParsePreviewProps) {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {data.observations.map((obs, i) => (
-                <tr key={i} className="hover:bg-gray-50">
+                <tr key={i} className={statusRowBg(obs.mara_status) || 'hover:bg-gray-50'}>
                   <td className="px-5 py-2 font-mono text-xs text-gray-600">{obs.code}</td>
                   <td className="px-5 py-2 text-gray-900">{obs.text}</td>
                   <td className="px-5 py-2 text-right font-medium text-gray-900">{obs.value}</td>

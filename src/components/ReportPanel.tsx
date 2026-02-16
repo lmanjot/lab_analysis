@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { GeminiReportPanel, HairStatus } from '../types'
-import { normalizeStatus, statusColor, statusLabel, isStatusAbnormal } from '../services/statusUtils'
+import { normalizeStatus, statusColor, statusLabel, isStatusAbnormal, statusRowBg } from '../services/statusUtils'
 
 interface ReportPanelProps {
   panel: GeminiReportPanel
@@ -74,7 +74,7 @@ export default function ReportPanel({ panel }: ReportPanelProps) {
               return (
                 <tr
                   key={i}
-                  className={highlight ? 'bg-amber-50/80' : undefined}
+                  className={highlight ? (statusRowBg(bio.status) || 'bg-amber-50/60') : undefined}
                 >
                   <td className="px-4 py-2">
                     <div className="font-medium text-gray-900">{bio.name}</div>
