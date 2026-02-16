@@ -26,6 +26,7 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedH
   const [customPrompt, setCustomPrompt] = useState(DEFAULT_CUSTOM_PROMPT)
   const [showPrompt, setShowPrompt] = useState(false)
   const [showHL7Input, setShowHL7Input] = useState(!preloadedHL7)
+  const [showDebug, setShowDebug] = useState(false)
   const [parsedPreview, setParsedPreview] = useState<ParsedHL7 | null>(null)
   const [parseError, setParseError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -127,180 +128,14 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedH
         </div>
       )}
 
-      {/* HubSpot banner */}
-      {preloadedHL7 && hubspotContactName && (
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 flex items-center gap-3">
-          <svg className="w-5 h-5 text-orange-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-          </svg>
-          <div>
-            <p className="text-sm font-medium text-orange-800">
-              {t('input.hubspotLoaded', { name: hubspotContactName })}
-            </p>
-            <p className="text-xs text-orange-600 mt-0.5">
-              {t('input.hubspotHL7Chars', { count: preloadedHL7.length })}
-            </p>
-          </div>
+      {/* Only show when HL7 tab and no data */}
+      {activeTab === 'hl7' && !hl7Text.trim() && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
+          <p className="text-sm text-amber-800">{t('input.noHL7Data')}</p>
         </div>
       )}
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        {/* Tabs */}
-        <div className="flex border-b border-gray-200">
-          <button
-            onClick={() => setActiveTab('hl7')}
-            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-              activeTab === 'hl7'
-                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            {t('input.tabHL7')}
-          </button>
-          <button
-            onClick={() => setActiveTab('pdf')}
-            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-              activeTab === 'pdf'
-                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            {t('input.tabPDF')}
-          </button>
-        </div>
-
-        <div className="p-5">
-          {activeTab === 'hl7' ? (
-            <div>
-              {/* Collapsible header when preloaded from HubSpot */}
-              {preloadedHL7 && (
-                <button
-                  onClick={() => setShowHL7Input(!showHL7Input)}
-                  className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2 hover:text-gray-900"
-                >
-                  <svg
-                    className={`w-4 h-4 text-gray-400 transition-transform ${showHL7Input ? 'rotate-180' : ''}`}
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                  {t('input.hl7Label')}
-                </button>
-              )}
-              {!preloadedHL7 && (
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('input.hl7Label')}
-                </label>
-              )}
-              {showHL7Input && (
-                <textarea
-                  value={hl7Text}
-                  onChange={(e) => handleHL7Change(e.target.value)}
-                  placeholder={t('input.hl7Placeholder')}
-                  rows={12}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y"
-                />
-              )}
-            </div>
-          ) : (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('input.pdfLabel')}
-              </label>
-              <div
-                onDrop={handleDrop}
-                onDragOver={(e) => e.preventDefault()}
-                onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-colors"
-              >
-                {pdfFile ? (
-                  <div className="space-y-2">
-                    <svg className="w-10 h-10 text-blue-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <p className="text-sm text-gray-700 font-medium">
-                      {t('input.pdfSelected', { filename: pdfFile.name })}
-                    </p>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setPdfFile(null)
-                      }}
-                      className="text-xs text-red-600 hover:text-red-800 underline"
-                    >
-                      {t('input.pdfRemove')}
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <svg className="w-10 h-10 text-gray-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
-                    <p className="text-sm text-gray-500">{t('input.pdfDrop')}</p>
-                  </div>
-                )}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="application/pdf"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
-              </div>
-            </div>
-          )}
-
-          {parseError && (
-            <div className="mt-3 bg-red-50 border border-red-200 rounded-md p-3">
-              <p className="text-sm text-red-700">{parseError}</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <PatientContext value={patientCtx} onChange={setPatientCtx} />
-
-      {/* Custom AI Prompt */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <button
-          onClick={() => setShowPrompt(!showPrompt)}
-          className="w-full flex items-center justify-between px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          <span>{t('input.customPrompt')}</span>
-          <svg
-            className={`w-4 h-4 text-gray-400 transition-transform ${showPrompt ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        {showPrompt && (
-          <div className="px-5 pb-5 border-t border-gray-100">
-            <p className="text-xs text-gray-500 mt-3 mb-2">{t('input.customPromptHint')}</p>
-            <textarea
-              value={customPrompt}
-              onChange={(e) => setCustomPrompt(e.target.value)}
-              rows={16}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs font-mono leading-relaxed focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y"
-            />
-            {customPrompt !== DEFAULT_CUSTOM_PROMPT && (
-              <button
-                onClick={() => setCustomPrompt(DEFAULT_CUSTOM_PROMPT)}
-                className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
-              >
-                Reset to default
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-
-      {parsedPreview && activeTab === 'hl7' && (
-        <ParsePreview data={parsedPreview} />
-      )}
-
+      {/* 1. Run analysis button */}
       <button
         onClick={handleAnalyze}
         disabled={!canAnalyze}
@@ -308,6 +143,162 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedH
       >
         {t('input.analyze')}
       </button>
+
+      {/* 2. Parsed data preview */}
+      {parsedPreview && activeTab === 'hl7' && (
+        <ParsePreview data={parsedPreview} />
+      )}
+
+      {/* 3. Debug: HL7/PDF upload, medical form, AI prompt — collapsed by default */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <button
+          onClick={() => setShowDebug(!showDebug)}
+          className="w-full flex items-center justify-between px-5 py-3 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+        >
+          <span>{t('input.debugSection')}</span>
+          <svg
+            className={`w-4 h-4 text-gray-400 transition-transform ${showDebug ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {showDebug && (
+          <div className="border-t border-gray-100 space-y-4 p-5">
+            <div className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+              <div className="flex border-b border-gray-200">
+                <button
+                  onClick={() => setActiveTab('hl7')}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    activeTab === 'hl7'
+                      ? 'text-blue-600 border-b-2 border-blue-600 bg-white'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {t('input.tabHL7')}
+                </button>
+                <button
+                  onClick={() => setActiveTab('pdf')}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    activeTab === 'pdf'
+                      ? 'text-blue-600 border-b-2 border-blue-600 bg-white'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {t('input.tabPDF')}
+                </button>
+              </div>
+              <div className="p-5 bg-white">
+                {activeTab === 'hl7' ? (
+                  <div>
+                    {preloadedHL7 && (
+                      <button
+                        onClick={() => setShowHL7Input(!showHL7Input)}
+                        className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2 hover:text-gray-900"
+                      >
+                        <svg
+                          className={`w-4 h-4 text-gray-400 transition-transform ${showHL7Input ? 'rotate-180' : ''}`}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                        {t('input.hl7Label')}
+                      </button>
+                    )}
+                    {(!preloadedHL7 || showHL7Input) && (
+                      <textarea
+                        value={hl7Text}
+                        onChange={(e) => handleHL7Change(e.target.value)}
+                        placeholder={t('input.hl7Placeholder')}
+                        rows={10}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y"
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('input.pdfLabel')}
+                    </label>
+                    <div
+                      onDrop={handleDrop}
+                      onDragOver={(e) => e.preventDefault()}
+                      onClick={() => fileInputRef.current?.click()}
+                      className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-colors"
+                    >
+                      {pdfFile ? (
+                        <div className="space-y-2">
+                          <p className="text-sm text-gray-700 font-medium">
+                            {t('input.pdfSelected', { filename: pdfFile.name })}
+                          </p>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setPdfFile(null) }}
+                            className="text-xs text-red-600 hover:text-red-800 underline"
+                          >
+                            {t('input.pdfRemove')}
+                          </button>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500">{t('input.pdfDrop')}</p>
+                      )}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="application/pdf"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+                    </div>
+                  </div>
+                )}
+                {parseError && (
+                  <div className="mt-3 bg-red-50 border border-red-200 rounded-md p-3">
+                    <p className="text-sm text-red-700">{parseError}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <PatientContext value={patientCtx} onChange={setPatientCtx} />
+
+            <div>
+              <button
+                onClick={() => setShowPrompt(!showPrompt)}
+                className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 mb-2"
+              >
+                <svg
+                  className={`w-4 h-4 text-gray-400 transition-transform ${showPrompt ? 'rotate-180' : ''}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+                {t('input.customPrompt')}
+              </button>
+              {showPrompt && (
+                <div className="mt-2">
+                  <p className="text-xs text-gray-500 mb-2">{t('input.customPromptHint')}</p>
+                  <textarea
+                    value={customPrompt}
+                    onChange={(e) => setCustomPrompt(e.target.value)}
+                    rows={12}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs font-mono leading-relaxed focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y"
+                  />
+                  {customPrompt !== DEFAULT_CUSTOM_PROMPT && (
+                    <button
+                      onClick={() => setCustomPrompt(DEFAULT_CUSTOM_PROMPT)}
+                      className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Reset to default
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

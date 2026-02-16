@@ -30,7 +30,9 @@
     "hidePrompt": "Hide AI Prompt",
     "hubspotLoaded": "HL7 data loaded from HubSpot for {{name}}",
     "hubspotHL7Chars": "{{count}} characters of HL7 data",
-    "hubspotLoading": "Loading data from HubSpot..."
+    "hubspotLoading": "Loading data from HubSpot...",
+    "noHL7Data": "No blood test data (HL7) found",
+    "debugSection": "Debug: data, medical form & prompt"
   },
   "patient": {
     "title": "Medical Form Data",

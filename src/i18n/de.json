@@ -30,7 +30,9 @@
     "hidePrompt": "KI-Prompt ausblenden",
     "hubspotLoaded": "HL7-Daten von HubSpot geladen für {{name}}",
     "hubspotHL7Chars": "{{count}} Zeichen HL7-Daten",
-    "hubspotLoading": "Daten werden von HubSpot geladen..."
+    "hubspotLoading": "Daten werden von HubSpot geladen...",
+    "noHL7Data": "Keine Blutbilddaten (HL7) gefunden",
+    "debugSection": "Debug: Daten, Anamnese & Prompt"
   },
   "patient": {
     "title": "Medizinische Formulardaten",
