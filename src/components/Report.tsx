@@ -82,32 +82,65 @@ export default function Report({ report, patient, onNewAnalysis }: ReportProps) 
           </div>
         )}
 
-        {/* Interpretation */}
-        {report.interpretation && (
+        {/* 1. General Health Assessment */}
+        {report.generalHealth && (
           <div className="px-6 py-4 border-b border-gray-100">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              {t('report.interpretation')}
+              {t('report.generalHealth')}
             </h3>
             <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
-              {report.interpretation}
+              {report.generalHealth}
             </div>
           </div>
         )}
 
-        {/* Follow-up */}
-        {report.followUp.length > 0 && (
+        {/* 2. Hair-Relevant Biomarker Summary */}
+        {report.hairSummary && (
           <div className="px-6 py-4 border-b border-gray-100">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              {t('report.followUp')}
+              {t('report.hairSummary')}
             </h3>
-            <ul className="space-y-2">
-              {report.followUp.map((rec, i) => (
-                <li key={i} className="flex gap-2 text-sm text-gray-800">
-                  <span className="text-blue-500 font-bold mt-0.5">&#8226;</span>
-                  <span>{rec}</span>
-                </li>
+            <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
+              {report.hairSummary}
+            </div>
+          </div>
+        )}
+
+        {/* 3. Etiology Assessment */}
+        {report.etiologyAssessment && (
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              {t('report.etiologyAssessment')}
+            </h3>
+            <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
+              {report.etiologyAssessment}
+            </div>
+          </div>
+        )}
+
+        {/* 4. Regenerative Indication */}
+        {report.regenerativeIndication && (
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              {t('report.regenerativeIndication')}
+            </h3>
+            <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
+              {report.regenerativeIndication}
+            </div>
+          </div>
+        )}
+
+        {/* 5. Action Plan */}
+        {report.actionPlan.length > 0 && (
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              {t('report.actionPlan')}
+            </h3>
+            <ol className="space-y-2 list-decimal list-inside">
+              {report.actionPlan.map((item, i) => (
+                <li key={i} className="text-sm text-gray-800">{item}</li>
               ))}
-            </ul>
+            </ol>
           </div>
         )}
 

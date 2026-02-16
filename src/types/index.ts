@@ -141,10 +141,12 @@ export interface GeminiReportBiomarker {
 
 export interface GeminiReport {
   medicalRecordAnalysis: string
-  summary: string
+  generalHealth: string
+  hairSummary: string
+  etiologyAssessment: string
+  regenerativeIndication: string
   panels: GeminiReportPanel[]
-  interpretation: string
-  followUp: string[]
+  actionPlan: string[]
 }
 
 // Auth types

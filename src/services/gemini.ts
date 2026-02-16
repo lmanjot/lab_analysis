@@ -125,19 +125,23 @@ function parseGeminiResponse(text: string): GeminiReport {
       : []
     return {
       medicalRecordAnalysis: parsed.medicalRecordAnalysis || '',
-      summary: parsed.summary || '',
+      generalHealth: parsed.generalHealth || '',
+      hairSummary: parsed.hairSummary || '',
+      etiologyAssessment: parsed.etiologyAssessment || '',
+      regenerativeIndication: parsed.regenerativeIndication || '',
       panels,
-      interpretation: parsed.interpretation || '',
-      followUp: Array.isArray(parsed.followUp) ? parsed.followUp : [],
+      actionPlan: Array.isArray(parsed.actionPlan) ? parsed.actionPlan : [],
     }
   } catch {
     // If JSON parsing fails, create a fallback report from the raw text
     return {
       medicalRecordAnalysis: '',
-      summary: 'The AI analysis was completed but the response could not be structured automatically.',
+      generalHealth: '',
+      hairSummary: '',
+      etiologyAssessment: text,
+      regenerativeIndication: '',
       panels: [],
-      interpretation: text,
-      followUp: [],
+      actionPlan: [],
     }
   }
 }
