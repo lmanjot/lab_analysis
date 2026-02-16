@@ -1,0 +1,14 @@
+[
+	{
+		"parameter": "ZINK",
+		"ideal_range": ">13"
+	},
+	{
+		"parameter": "FERR",
+		"ideal_range": "70-100"
+	},
+	{
+		"parameter": "VITD3",
+		"ideal_range": "40-60"
+	}
+]

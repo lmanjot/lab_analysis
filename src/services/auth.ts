@@ -1,0 +1,146 @@
+import { AuthState } from '../types'
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        oauth2: {
+          initTokenClient(config: {
+            client_id: string
+            scope: string
+            callback: (response: TokenResponse) => void
+            error_callback?: (error: { type: string; message: string }) => void
+          }): TokenClient
+        }
+        id: {
+          initialize(config: {
+            client_id: string
+            callback: (response: { credential: string }) => void
+          }): void
+          prompt(): void
+          revoke(email: string, callback: () => void): void
+        }
+      }
+    }
+  }
+}
+
+interface TokenResponse {
+  access_token: string
+  expires_in: number
+  scope: string
+  token_type: string
+  error?: string
+}
+
+interface TokenClient {
+  requestAccessToken(overrideConfig?: { prompt?: string }): void
+}
+
+let tokenClient: TokenClient | null = null
+let onAuthChange: ((state: AuthState) => void) | null = null
+
+const SCOPES = [
+  'https://www.googleapis.com/auth/generative-language',
+  'https://www.googleapis.com/auth/generative-language.tuning',
+  'https://www.googleapis.com/auth/generative-language.retriever',
+  'openid',
+  'email',
+  'profile',
+].join(' ')
+
+function createEmptyAuthState(): AuthState {
+  return {
+    isSignedIn: false,
+    accessToken: null,
+    email: null,
+    name: null,
+    expiresAt: null,
+  }
+}
+
+async function fetchUserInfo(accessToken: string): Promise<{ email: string; name: string }> {
+  const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+  if (!response.ok) throw new Error('Failed to fetch user info')
+  const data = await response.json()
+  return { email: data.email, name: data.name }
+}
+
+export function initAuth(callback: (state: AuthState) => void): void {
+  onAuthChange = callback
+
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+  if (!clientId) {
+    console.warn('VITE_GOOGLE_CLIENT_ID is not set. Google OAuth will not work.')
+    return
+  }
+
+  const checkGoogle = () => {
+    if (window.google?.accounts?.oauth2) {
+      tokenClient = window.google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: SCOPES,
+        callback: async (response: TokenResponse) => {
+          if (response.error) {
+            console.error('OAuth error:', response.error)
+            onAuthChange?.(createEmptyAuthState())
+            return
+          }
+
+          try {
+            const userInfo = await fetchUserInfo(response.access_token)
+            const state: AuthState = {
+              isSignedIn: true,
+              accessToken: response.access_token,
+              email: userInfo.email,
+              name: userInfo.name,
+              expiresAt: Date.now() + response.expires_in * 1000,
+            }
+            onAuthChange?.(state)
+          } catch {
+            const state: AuthState = {
+              isSignedIn: true,
+              accessToken: response.access_token,
+              email: null,
+              name: null,
+              expiresAt: Date.now() + response.expires_in * 1000,
+            }
+            onAuthChange?.(state)
+          }
+        },
+        error_callback: (error) => {
+          console.error('OAuth error callback:', error)
+        },
+      })
+    } else {
+      setTimeout(checkGoogle, 200)
+    }
+  }
+
+  checkGoogle()
+}
+
+export function signIn(): void {
+  if (tokenClient) {
+    tokenClient.requestAccessToken({ prompt: 'consent' })
+  } else {
+    console.error('Token client not initialized')
+  }
+}
+
+export function signOut(): void {
+  onAuthChange?.(createEmptyAuthState())
+}
+
+export function isTokenExpired(auth: AuthState): boolean {
+  if (!auth.expiresAt) return true
+  return Date.now() >= auth.expiresAt - 60000 // 1 minute buffer
+}
+
+export function refreshToken(): void {
+  if (tokenClient) {
+    tokenClient.requestAccessToken({ prompt: '' })
+  }
+}

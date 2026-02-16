@@ -1,0 +1,86 @@
+{
+  "app": {
+    "title": "Labor-Analyse",
+    "subtitle": "KI-gestützte Blutbild-Analyse"
+  },
+  "auth": {
+    "signIn": "Mit Google anmelden",
+    "signOut": "Abmelden",
+    "signedInAs": "Angemeldet als {{email}}",
+    "signInRequired": "Bitte melden Sie sich mit Ihrem Google-Konto an, um die Analysefunktionen zu nutzen.",
+    "tokenExpired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
+  },
+  "input": {
+    "title": "Labordaten-Eingabe",
+    "tabHL7": "HL7-Daten",
+    "tabPDF": "PDF-Upload",
+    "hl7Placeholder": "Fügen Sie hier Ihre HL7 v2.x Nachricht ein...\n\nBeispiel:\nMSH|^~\\&|ANALYTICA|ANALYTICA|||20250925120306||ORU^R01|...\nPID|1||12345||MUSTER^MAX||19900101|M|||\nOBX|1|NM|FERR^Ferritin||85|ng/ml|15-200||||F",
+    "hl7Label": "HL7-Nachricht",
+    "pdfLabel": "Laborbericht als PDF hochladen",
+    "pdfDrop": "PDF-Datei hierher ziehen oder klicken zum Durchsuchen",
+    "pdfSelected": "Ausgewählt: {{filename}}",
+    "pdfRemove": "Entfernen",
+    "analyze": "Mit KI analysieren",
+    "analyzing": "Wird analysiert...",
+    "parsePreview": "Vorschau der analysierten Daten",
+    "noData": "Keine Daten vorhanden. Bitte HL7-Daten einfügen oder ein PDF hochladen."
+  },
+  "patient": {
+    "title": "Patientenkontext (Optional)",
+    "age": "Alter",
+    "sex": "Geschlecht",
+    "sexMale": "Männlich",
+    "sexFemale": "Weiblich",
+    "sexOther": "Andere",
+    "weight": "Gewicht (kg)",
+    "height": "Grösse (cm)",
+    "conditions": "Bekannte Erkrankungen",
+    "conditionsPlaceholder": "z.B. Diabetes Typ 2, Bluthochdruck"
+  },
+  "report": {
+    "title": "Analysebericht",
+    "patient": "Patienteninformation",
+    "summary": "Zusammenfassung",
+    "panels": "Ergebnisse nach Panel",
+    "interpretation": "Klinische Interpretation",
+    "followUp": "Empfehlungen für Folgeuntersuchungen",
+    "print": "Bericht drucken",
+    "newAnalysis": "Neue Analyse",
+    "value": "Wert",
+    "refRange": "Referenzbereich",
+    "idealRange": "Idealbereich",
+    "units": "Einheit",
+    "status": "Status",
+    "biomarker": "Biomarker",
+    "normal": "Normal",
+    "belowIdeal": "Unter Idealbereich",
+    "aboveIdeal": "Über Idealbereich",
+    "belowRef": "Unter Referenzbereich",
+    "aboveRef": "Über Referenzbereich",
+    "disclaimer": "Dieser Bericht wurde von einer KI erstellt und dient nur zu Informationszwecken. Er ersetzt keine professionelle medizinische Beratung, Diagnose oder Behandlung. Konsultieren Sie immer einen qualifizierten Arzt."
+  },
+  "preview": {
+    "patientName": "Patient",
+    "dob": "Geburtsdatum",
+    "sex": "Geschlecht",
+    "observations": "Beobachtungen",
+    "code": "Code",
+    "description": "Beschreibung",
+    "value": "Wert",
+    "units": "Einheit",
+    "refRange": "Ref.-Bereich",
+    "status": "Status",
+    "notes": "Notizen"
+  },
+  "errors": {
+    "parseError": "HL7-Daten konnten nicht verarbeitet werden. Bitte überprüfen Sie das Format.",
+    "apiError": "Analyse fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "noToken": "Authentifizierung erforderlich. Bitte melden Sie sich an.",
+    "pdfTooLarge": "PDF-Datei ist zu gross. Maximale Grösse ist 10 MB.",
+    "invalidPdf": "Bitte wählen Sie eine gültige PDF-Datei aus."
+  },
+  "language": {
+    "en": "English",
+    "de": "Deutsch"
+  }
+}

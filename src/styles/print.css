@@ -1,0 +1,93 @@
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm 12mm;
+  }
+
+  body {
+    font-size: 11pt;
+    color: #000;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide non-print elements */
+  header,
+  footer,
+  .print\:hidden,
+  button {
+    display: none !important;
+  }
+
+  /* Show print-visible elements */
+  .print\:block {
+    display: block !important;
+  }
+
+  /* Remove shadows and unnecessary borders */
+  .shadow,
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg {
+    box-shadow: none !important;
+  }
+
+  /* Ensure proper page breaks */
+  .break-inside-avoid {
+    break-inside: avoid;
+  }
+
+  h2, h3, h4 {
+    break-after: avoid;
+  }
+
+  table {
+    break-inside: avoid;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+
+  /* Report container - remove rounded corners in print */
+  .rounded-lg {
+    border-radius: 0 !important;
+  }
+
+  /* Ensure tables print properly */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 4pt 8pt;
+  }
+
+  /* Status badges should print with color */
+  .bg-green-50,
+  .bg-green-100 {
+    background-color: #dcfce7 !important;
+  }
+
+  .bg-amber-50,
+  .bg-yellow-100 {
+    background-color: #fef3c7 !important;
+  }
+
+  .bg-red-50,
+  .bg-red-100 {
+    background-color: #fef2f2 !important;
+  }
+
+  /* Reset max-width for print */
+  .max-w-7xl {
+    max-width: none !important;
+  }
+
+  /* Remove hover styles */
+  .hover\:bg-gray-50:hover {
+    background-color: transparent !important;
+  }
+}
