@@ -34,11 +34,15 @@ Briefly identify any clinically significant systemic findings (e.g., thyroid dys
 If none: state "No clinically significant systemic abnormalities identified."
 No hair interpretation here.
 
-### 2. Hair-Relevant Biomarker Summary
-Bullet points listing:
-- Overall lab profile (Normal / Mostly normal / Significant abnormalities)
-- Suboptimal or abnormal hair-related markers (only if present)
-No narrative explanation. Do not restate normal values.
+### 2. Hair-Relevant Biomarker Overview
+Provide one single concise sentence summarizing:
+The overall lab profile (Normal / Mostly normal / Significant abnormalities)
+Only clinically relevant suboptimal or abnormal hair-related markers (if present)
+Do not use bullet points.
+Do not restate values.
+Do not interpret here.
+If no hair-relevant abnormalities are present, state:
+"No significant hair-relevant biomarker abnormalities identified."
 
 ### 3. Etiology Assessment
 One clear paragraph identifying the most likely primary driver:
@@ -78,7 +82,7 @@ IMPORTANT: Analyze this medical record carefully. Cross-reference the patient's 
 const JSON_SCHEMA = `{
   "medicalRecordAnalysis": "Brief analysis of the patient's medical record/questionnaire — summarize the patient profile (age, sex, relevant conditions, medications, lifestyle factors, symptoms) and note how these may interact with the lab results and hair health. If no medical record was provided, set this to an empty string.",
   "generalHealth": "Section 1: General Health Assessment. Briefly identify any clinically significant systemic findings. If none, state: No clinically significant systemic abnormalities identified. No hair interpretation here.",
-  "hairSummary": "Section 2: Hair-Relevant Biomarker Summary. Bullet points: overall lab profile (Normal / Mostly normal / Significant abnormalities), key suboptimal or abnormal hair-related markers. No narrative.",
+  "hairSummary": "Section 2: Hair-Relevant Biomarker Overview. One single concise sentence: overall lab profile (Normal / Mostly normal / Significant abnormalities) and only clinically relevant suboptimal or abnormal hair-related markers if present. No bullet points, no restating values. If none: No significant hair-relevant biomarker abnormalities identified.",
   "etiologyAssessment": "Section 3: Etiology Assessment. One clear paragraph identifying the most likely primary driver (androgenetic, deficiency-driven, stress-related, inflammatory, mixed). If labs largely normal, state hair loss is unlikely deficiency-driven. No repetition of lab values.",
   "regenerativeIndication": "Section 4: Regenerative Indication. Whether PRP/exosome therapy is indicated, whether correction-first strategy is required, whether structured supplementation should accompany therapy. Keep concise.",
   "panels": [

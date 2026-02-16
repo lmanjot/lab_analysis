@@ -39,33 +39,35 @@ export default function App() {
         'Google OAuth is not configured.\n\nOn Vercel: set goauthid in Environment Variables.\nFor local dev: create a .env file with VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com\nThen restart the dev server.'
       )
     }
-
-    // Fetch HL7 from HubSpot if contactid URL param is present
-    const contactId = getContactIdFromURL()
-    if (contactId) {
-      setHubspotLoading(true)
-      fetchHL7FromHubSpot(contactId)
-        .then((data) => {
-          if (data.hl7) {
-            setPreloadedHL7(data.hl7)
-          } else {
-            setError(`No HL7 data found for contact ${data.contactName || contactId}`)
-          }
-          if (data.contactName) {
-            setHubspotContactName(data.contactName)
-          }
-          // Build patient context from HubSpot medical form data
-          const medicalText = formatMedicalAnswers(data.medicalFormAnswers || {})
-          if (medicalText) {
-            setHubspotPatientCtx({ medicalFormData: medicalText })
-          }
-        })
-        .catch((err) => {
-          setError(err instanceof Error ? err.message : 'Failed to load data from HubSpot')
-        })
-        .finally(() => setHubspotLoading(false))
-    }
   }, [])
+
+  // Fetch HL7 from HubSpot only when user is authorized and contactid URL param is present
+  useEffect(() => {
+    if (!auth.isSignedIn) return
+    const contactId = getContactIdFromURL()
+    if (!contactId) return
+    setHubspotLoading(true)
+    fetchHL7FromHubSpot(contactId)
+      .then((data) => {
+        if (data.hl7) {
+          setPreloadedHL7(data.hl7)
+        } else {
+          setError(`No HL7 data found for contact ${data.contactName || contactId}`)
+        }
+        if (data.contactName) {
+          setHubspotContactName(data.contactName)
+        }
+        // Build patient context from HubSpot medical form data
+        const medicalText = formatMedicalAnswers(data.medicalFormAnswers || {})
+        if (medicalText) {
+          setHubspotPatientCtx({ medicalFormData: medicalText })
+        }
+      })
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : 'Failed to load data from HubSpot')
+      })
+      .finally(() => setHubspotLoading(false))
+  }, [auth.isSignedIn])
 
   const ensureValidToken = useCallback((): string | null => {
     if (!auth.accessToken) return null
