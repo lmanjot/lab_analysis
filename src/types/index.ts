@@ -140,6 +140,7 @@ export interface GeminiReportBiomarker {
 }
 
 export interface GeminiReport {
+  medicalRecordAnalysis: string
   summary: string
   panels: GeminiReportPanel[]
   interpretation: string

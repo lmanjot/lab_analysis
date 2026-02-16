@@ -70,6 +70,18 @@ export default function Report({ report, patient, onNewAnalysis }: ReportProps) 
           </div>
         )}
 
+        {/* Medical Record Analysis */}
+        {report.medicalRecordAnalysis && (
+          <div className="px-6 py-4 border-b border-gray-100 bg-blue-50/30">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              {t('report.medicalRecord')}
+            </h3>
+            <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
+              {report.medicalRecordAnalysis}
+            </div>
+          </div>
+        )}
+
         {/* Summary */}
         {report.summary && (
           <div className="px-6 py-4 border-b border-gray-100">

@@ -34,10 +34,15 @@ When interpreting values:
 
 function buildPatientContextString(patient: PatientContext | null, _lang: string): string {
   if (!patient?.medicalFormData) return ''
-  return `\n## Patient Medical Form Data:\n${patient.medicalFormData}`
+  return `
+## Patient Medical Record (from intake questionnaire):
+${patient.medicalFormData}
+
+IMPORTANT: Analyze this medical record carefully. Cross-reference the patient's self-reported conditions, medications, symptoms, and history with the lab results. In the "medicalRecordAnalysis" field of your response, provide a brief analysis of the medical record itself — summarize key findings from the questionnaire (age, sex, relevant conditions, medications, symptoms) and note how they may relate to the lab values and hair loss. This section should help the clinician quickly understand the patient profile before reading the lab interpretation.`
 }
 
 const JSON_SCHEMA = `{
+  "medicalRecordAnalysis": "Brief analysis of the patient's medical record/questionnaire — summarize the patient profile (age, sex, relevant conditions, medications, lifestyle factors, symptoms) and note how these may interact with the lab results and hair health. If no medical record was provided, set this to an empty string.",
   "summary": "A concise 2-3 sentence overview of the overall results, highlighting significant findings for both hair health and general health.",
   "panels": [
     {

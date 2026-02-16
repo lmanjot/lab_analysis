@@ -124,6 +124,7 @@ function parseGeminiResponse(text: string): GeminiReport {
         }))
       : []
     return {
+      medicalRecordAnalysis: parsed.medicalRecordAnalysis || '',
       summary: parsed.summary || '',
       panels,
       interpretation: parsed.interpretation || '',
@@ -132,6 +133,7 @@ function parseGeminiResponse(text: string): GeminiReport {
   } catch {
     // If JSON parsing fails, create a fallback report from the raw text
     return {
+      medicalRecordAnalysis: '',
       summary: 'The AI analysis was completed but the response could not be structured automatically.',
       panels: [],
       interpretation: text,

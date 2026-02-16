@@ -40,6 +40,7 @@
   "report": {
     "title": "Analysebericht",
     "patient": "Patienteninformation",
+    "medicalRecord": "Medizinisches Patientenprofil",
     "summary": "Zusammenfassung",
     "panels": "Ergebnisse nach Panel",
     "interpretation": "Klinische Interpretation",
