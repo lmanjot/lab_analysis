@@ -157,8 +157,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const lastName = props.lastname || ''
     const email = props.email || ''
     const birthDate = props.date_of_birth || ''
-    const sourceLabTestUrl = (props.blood_analysis__lab_ || '').trim() || undefined
+    const sourceLabTestFileId = (props.blood_analysis__lab_ || '').trim() || undefined
     const medicalQuestionnaireUrl = (props.medical_lastquestionnaire || '').trim() || undefined
+
+    // Resolve file ID to a signed URL (HubSpot file-type properties store an ID, not a URL)
+    let sourceLabTestUrl: string | undefined
+    if (sourceLabTestFileId) {
+      try {
+        const fileRes = await fetch(
+          `https://api.hubapi.com/files/v3/files/${encodeURIComponent(sourceLabTestFileId)}/signed-url`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        if (fileRes.ok) {
+          const fileData = await fileRes.json()
+          sourceLabTestUrl = fileData.url || undefined
+        } else {
+          console.error('HubSpot file signed-url error:', fileRes.status)
+        }
+      } catch (err) {
+        console.error('Error fetching signed URL for lab test file:', err)
+      }
+    }
 
     // 2. Calculate age from birthdate
     const age = calculateAge(birthDate)
