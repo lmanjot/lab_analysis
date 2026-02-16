@@ -83,8 +83,8 @@ IMPORTANT: Analyze this medical record carefully. Cross-reference the patient's 
 function getLanguageInstruction(lang: string): string {
   const isGerman = typeof lang === 'string' && lang.toLowerCase().startsWith('de')
   return isGerman
-    ? 'LANGUAGE: You must respond entirely in German (Deutsch). All sections, labels, and text in your JSON output must be in German.'
-    : 'LANGUAGE: You must respond entirely in English. All sections, labels, and text in your JSON output must be in English.'
+    ? 'CRITICAL — OUTPUT LANGUAGE: Respond ONLY in German (Deutsch). Every field in your JSON (medicalRecordAnalysis, generalHealth, hairSummary, etiologyAssessment, regenerativeIndication, panel names, biomarker names, interpretations, actionPlan items) must be written in German. Do not mix in any English.'
+    : 'CRITICAL — OUTPUT LANGUAGE: Respond ONLY in English. Every field in your JSON must be written in English. Do not mix in any other language.'
 }
 
 const JSON_SCHEMA = `{
@@ -136,9 +136,9 @@ export function buildHL7AnalysisPrompt(
     })
     .join('\n')
 
-  return `${customPrompt}
+  return `${langInstruction}
 
-${langInstruction}
+${customPrompt}
 
 ${patientInfo}
 
@@ -162,11 +162,11 @@ export function buildPDFAnalysisPrompt(
   const langInstruction = getLanguageInstruction(lang)
   const patientInfo = buildPatientContextString(patientContext, lang)
 
-  return `${customPrompt}
+  return `${langInstruction}
+
+${customPrompt}
 
 The attached PDF contains a laboratory report with blood test results. Extract all biomarker values and provide a structured medical analysis.
-
-${langInstruction}
 
 ${patientInfo}
 
