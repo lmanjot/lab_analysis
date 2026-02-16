@@ -171,6 +171,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const contactName = [firstName, lastName].filter(Boolean).join(' ')
 
+    // Log for debugging in Vercel function logs
+    console.log('HubSpot response for contact', contactId, {
+      firstName,
+      lastName,
+      email,
+      birthDate,
+      calculatedAge: age,
+      inferredSex: sex,
+      formGuids,
+      medicalFormAnswersKeys: Object.keys(medicalFormAnswers),
+    })
+
     return res.status(200).json({
       hl7,
       contactName,
@@ -178,6 +190,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       age,
       sex,
       medicalFormAnswers,
+      _debug: {
+        hasBirthDate: !!birthDate,
+        birthDateRaw: birthDate,
+        hasEmail: !!email,
+        formGuidsConfigured: formGuids.length,
+        formAnswersCount: Object.keys(medicalFormAnswers).length,
+      },
     })
   } catch (err) {
     console.error('HubSpot fetch error:', err)

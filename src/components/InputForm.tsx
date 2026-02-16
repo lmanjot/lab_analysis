@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ParsedHL7, PatientContext as PatientContextType, AuthState } from '../types'
 import { parseHL7Message } from '../services/hl7'
@@ -29,22 +29,28 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedH
   const [parsedPreview, setParsedPreview] = useState<ParsedHL7 | null>(null)
   const [parseError, setParseError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const preloadApplied = useRef(false)
+  const hl7Applied = useRef(false)
+  const ctxApplied = useRef(false)
 
-  // Apply preloaded HL7 and patient context from HubSpot once
-  if (!preloadApplied.current && (preloadedHL7 || hubspotPatientCtx)) {
-    preloadApplied.current = true
-    if (preloadedHL7) {
+  // Apply preloaded HL7 from HubSpot once
+  useEffect(() => {
+    if (preloadedHL7 && !hl7Applied.current) {
+      hl7Applied.current = true
       setHl7Text(preloadedHL7)
       try {
         const parsed = parseHL7Message(preloadedHL7)
         setParsedPreview(parsed)
       } catch { /* ignore parse errors on preload */ }
     }
-    if (hubspotPatientCtx) {
+  }, [preloadedHL7])
+
+  // Apply patient context from HubSpot once
+  useEffect(() => {
+    if (hubspotPatientCtx && !ctxApplied.current) {
+      ctxApplied.current = true
       setPatientCtx((prev) => ({ ...prev, ...hubspotPatientCtx }))
     }
-  }
+  }, [hubspotPatientCtx])
 
   const handleHL7Change = (text: string) => {
     setHl7Text(text)
