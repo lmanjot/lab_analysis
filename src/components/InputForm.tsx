@@ -2,13 +2,14 @@ import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ParsedHL7, PatientContext as PatientContextType, AuthState } from '../types'
 import { parseHL7Message } from '../services/hl7'
+import { DEFAULT_CUSTOM_PROMPT } from '../services/prompts'
 import PatientContext from './PatientContext'
 import ParsePreview from './ParsePreview'
 
 interface InputFormProps {
   auth: AuthState
-  onAnalyzeHL7: (parsedData: ParsedHL7, rawHL7: string, patientCtx: PatientContextType) => void
-  onAnalyzePDF: (file: File, patientCtx: PatientContextType) => void
+  onAnalyzeHL7: (parsedData: ParsedHL7, rawHL7: string, patientCtx: PatientContextType, customPrompt: string) => void
+  onAnalyzePDF: (file: File, patientCtx: PatientContextType, customPrompt: string) => void
 }
 
 type Tab = 'hl7' | 'pdf'
@@ -19,6 +20,8 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF }: InputFor
   const [hl7Text, setHl7Text] = useState('')
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [patientCtx, setPatientCtx] = useState<PatientContextType>({})
+  const [customPrompt, setCustomPrompt] = useState(DEFAULT_CUSTOM_PROMPT)
+  const [showPrompt, setShowPrompt] = useState(false)
   const [parsedPreview, setParsedPreview] = useState<ParsedHL7 | null>(null)
   const [parseError, setParseError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -75,13 +78,13 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF }: InputFor
       if (!hl7Text.trim()) return
       try {
         const parsed = parseHL7Message(hl7Text)
-        onAnalyzeHL7(parsed, hl7Text, patientCtx)
+        onAnalyzeHL7(parsed, hl7Text, patientCtx, customPrompt)
       } catch {
         setParseError(t('errors.parseError'))
       }
     } else {
       if (!pdfFile) return
-      onAnalyzePDF(pdfFile, patientCtx)
+      onAnalyzePDF(pdfFile, patientCtx, customPrompt)
     }
   }
 
@@ -194,6 +197,43 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF }: InputFor
       </div>
 
       <PatientContext value={patientCtx} onChange={setPatientCtx} />
+
+      {/* Custom AI Prompt */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <button
+          onClick={() => setShowPrompt(!showPrompt)}
+          className="w-full flex items-center justify-between px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          <span>{t('input.customPrompt')}</span>
+          <svg
+            className={`w-4 h-4 text-gray-400 transition-transform ${showPrompt ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {showPrompt && (
+          <div className="px-5 pb-5 border-t border-gray-100">
+            <p className="text-xs text-gray-500 mt-3 mb-2">{t('input.customPromptHint')}</p>
+            <textarea
+              value={customPrompt}
+              onChange={(e) => setCustomPrompt(e.target.value)}
+              rows={16}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs font-mono leading-relaxed focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y"
+            />
+            {customPrompt !== DEFAULT_CUSTOM_PROMPT && (
+              <button
+                onClick={() => setCustomPrompt(DEFAULT_CUSTOM_PROMPT)}
+                className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+              >
+                Reset to default
+              </button>
+            )}
+          </div>
+        )}
+      </div>
 
       {parsedPreview && activeTab === 'hl7' && (
         <ParsePreview data={parsedPreview} />

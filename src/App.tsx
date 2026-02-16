@@ -46,7 +46,7 @@ export default function App() {
   }, [auth])
 
   const handleAnalyzeHL7 = useCallback(
-    async (parsedData: ParsedHL7, rawHL7: string, patientCtx: PatientContext) => {
+    async (parsedData: ParsedHL7, rawHL7: string, patientCtx: PatientContext, customPrompt: string) => {
       const token = ensureValidToken()
       if (!token) {
         setError(t('errors.noToken'))
@@ -58,7 +58,7 @@ export default function App() {
       setPatient(parsedData.patient)
 
       try {
-        const prompt = buildHL7AnalysisPrompt(parsedData, rawHL7, patientCtx, i18n.language)
+        const prompt = buildHL7AnalysisPrompt(parsedData, rawHL7, patientCtx, i18n.language, customPrompt)
         const result = await analyzeWithGemini(token, prompt)
         setReport(result)
         setView('report')
@@ -76,7 +76,7 @@ export default function App() {
   )
 
   const handleAnalyzePDF = useCallback(
-    async (file: File, patientCtx: PatientContext) => {
+    async (file: File, patientCtx: PatientContext, customPrompt: string) => {
       const token = ensureValidToken()
       if (!token) {
         setError(t('errors.noToken'))
@@ -89,7 +89,7 @@ export default function App() {
 
       try {
         const pdfBase64 = await fileToBase64(file)
-        const prompt = buildPDFAnalysisPrompt(patientCtx, i18n.language)
+        const prompt = buildPDFAnalysisPrompt(patientCtx, i18n.language, customPrompt)
         const result = await analyzeWithGemini(token, prompt, pdfBase64)
         setReport(result)
         setView('report')

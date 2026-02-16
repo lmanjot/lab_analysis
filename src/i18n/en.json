@@ -23,7 +23,11 @@
     "analyze": "Analyze with AI",
     "analyzing": "Analyzing...",
     "parsePreview": "Parsed Data Preview",
-    "noData": "No data to analyze. Please paste HL7 data or upload a PDF."
+    "noData": "No data to analyze. Please paste HL7 data or upload a PDF.",
+    "customPrompt": "AI Prompt",
+    "customPromptHint": "Customize the instructions sent to Gemini. This tells the AI how to interpret the results.",
+    "showPrompt": "Show AI Prompt",
+    "hidePrompt": "Hide AI Prompt"
   },
   "patient": {
     "title": "Patient Context (Optional)",

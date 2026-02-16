@@ -23,7 +23,11 @@
     "analyze": "Mit KI analysieren",
     "analyzing": "Wird analysiert...",
     "parsePreview": "Vorschau der analysierten Daten",
-    "noData": "Keine Daten vorhanden. Bitte HL7-Daten einfügen oder ein PDF hochladen."
+    "noData": "Keine Daten vorhanden. Bitte HL7-Daten einfügen oder ein PDF hochladen.",
+    "customPrompt": "KI-Prompt",
+    "customPromptHint": "Passen Sie die Anweisungen an Gemini an. Dies steuert, wie die KI die Ergebnisse interpretiert.",
+    "showPrompt": "KI-Prompt anzeigen",
+    "hidePrompt": "KI-Prompt ausblenden"
   },
   "patient": {
     "title": "Patientenkontext (Optional)",
