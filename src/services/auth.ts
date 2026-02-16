@@ -39,6 +39,8 @@ interface TokenClient {
 
 let tokenClient: TokenClient | null = null
 let onAuthChange: ((state: AuthState) => void) | null = null
+let authInitError: string | null = null
+let authReady = false
 
 const SCOPES = [
   'https://www.googleapis.com/auth/generative-language',
@@ -95,10 +97,13 @@ function loadGisScript(): Promise<void> {
 
 export function initAuth(callback: (state: AuthState) => void): void {
   onAuthChange = callback
+  authInitError = null
+  authReady = false
 
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
   if (!clientId) {
-    console.warn('VITE_GOOGLE_CLIENT_ID is not set. Google OAuth will not work.')
+    authInitError = 'MISSING_CLIENT_ID'
+    console.warn('VITE_GOOGLE_CLIENT_ID is not set. Create a .env file with your Google OAuth Client ID.')
     return
   }
 
@@ -139,18 +144,27 @@ export function initAuth(callback: (state: AuthState) => void): void {
           console.error('OAuth error callback:', error)
         },
       })
+      authReady = true
     })
     .catch((err) => {
+      authInitError = 'LOAD_FAILED'
       console.error('Failed to initialize Google Auth:', err)
     })
 }
 
-export function signIn(): void {
-  if (tokenClient) {
-    tokenClient.requestAccessToken({ prompt: 'consent' })
-  } else {
-    console.error('Token client not initialized')
+export function getAuthStatus(): { ready: boolean; error: string | null } {
+  return { ready: authReady, error: authInitError }
+}
+
+export function signIn(): string | null {
+  if (authInitError === 'MISSING_CLIENT_ID') {
+    return 'Google OAuth Client ID is not configured. Create a .env file with VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com'
   }
+  if (!tokenClient) {
+    return 'Google sign-in is still loading. Please try again in a moment.'
+  }
+  tokenClient.requestAccessToken({ prompt: 'consent' })
+  return null
 }
 
 export function signOut(): void {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AuthState, AppView, ParsedHL7, PatientContext, GeminiReport, Patient } from './types'
-import { initAuth, signIn, signOut, isTokenExpired, refreshToken } from './services/auth'
+import { initAuth, signIn, signOut, isTokenExpired, refreshToken, getAuthStatus } from './services/auth'
 import { analyzeWithGemini, fileToBase64 } from './services/gemini'
 import { buildHL7AnalysisPrompt, buildPDFAnalysisPrompt } from './services/prompts'
 import Layout from './components/Layout'
@@ -24,8 +24,16 @@ export default function App() {
   const [patient, setPatient] = useState<Patient | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const [authConfigError, setAuthConfigError] = useState<string | null>(null)
+
   useEffect(() => {
     initAuth(setAuth)
+    const status = getAuthStatus()
+    if (status.error === 'MISSING_CLIENT_ID') {
+      setAuthConfigError(
+        'Google OAuth is not configured. Create a .env file in the project root with:\nVITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com\nThen restart the dev server.'
+      )
+    }
   }, [])
 
   const ensureValidToken = useCallback((): string | null => {
@@ -105,8 +113,20 @@ export default function App() {
     setError(null)
   }
 
+  const handleSignIn = () => {
+    const err = signIn()
+    if (err) setError(err)
+  }
+
   return (
-    <Layout auth={auth} onSignIn={signIn} onSignOut={signOut}>
+    <Layout auth={auth} onSignIn={handleSignIn} onSignOut={signOut}>
+      {authConfigError && (
+        <div className="mb-6 bg-amber-50 border border-amber-300 rounded-lg p-4 print:hidden">
+          <h3 className="text-sm font-semibold text-amber-800 mb-1">Setup Required</h3>
+          <pre className="text-xs text-amber-700 whitespace-pre-wrap font-mono">{authConfigError}</pre>
+        </div>
+      )}
+
       {error && (
         <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex justify-between items-center print:hidden">
           <p className="text-sm text-red-700">{error}</p>
