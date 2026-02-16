@@ -1,89 +1,32 @@
 import { GeminiReport } from '../types'
-import { getGoogleProjectId, getGoogleLocation } from './auth'
-
-const MODEL = 'gemini-2.0-flash'
-
-function getEndpointUrl(): string {
-  const projectId = getGoogleProjectId()
-  const location = getGoogleLocation()
-
-  if (!projectId) {
-    throw new Error(
-      'Google Cloud Project ID is not configured. Set goprojectid in Vercel, or VITE_GOOGLE_PROJECT_ID in .env'
-    )
-  }
-
-  // Vertex AI endpoint supports OAuth (generativelanguage.googleapis.com does not)
-  return `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${MODEL}`
-}
-
-interface GeminiPart {
-  text?: string
-  inlineData?: {
-    mimeType: string
-    data: string
-  }
-}
-
-interface GeminiContent {
-  role: 'user' | 'model'
-  parts: GeminiPart[]
-}
-
-interface GeminiRequest {
-  contents: GeminiContent[]
-  generationConfig?: {
-    temperature?: number
-    maxOutputTokens?: number
-  }
-}
 
 export async function analyzeWithGemini(
   accessToken: string,
   prompt: string,
   pdfBase64?: string
 ): Promise<GeminiReport> {
-  const parts: GeminiPart[] = []
-
-  if (pdfBase64) {
-    parts.push({
-      inlineData: {
-        mimeType: 'application/pdf',
-        data: pdfBase64,
-      },
-    })
-  }
-
-  parts.push({ text: prompt })
-
-  const requestBody: GeminiRequest = {
-    contents: [{ role: 'user', parts }],
-    generationConfig: {
-      temperature: 0.3,
-      maxOutputTokens: 8192,
-    },
-  }
-
-  const endpointUrl = getEndpointUrl()
-
-  const response = await fetch(`${endpointUrl}:generateContent`, {
+  const response = await fetch('/api/analyze', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${accessToken}`,
+      Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(requestBody),
+    body: JSON.stringify({ prompt, pdfBase64 }),
   })
 
   if (response.status === 401) {
     throw new Error('TOKEN_EXPIRED')
   }
 
+  if (response.status === 403) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error((errorData as { message?: string })?.message || 'Access denied')
+  }
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
-    throw new Error(
-      `Gemini API error (${response.status}): ${errorData?.error?.message || response.statusText}`
-    )
+    const message = (errorData as { message?: string })?.message || (errorData as { error?: string })?.error || response.statusText
+    throw new Error(`Analysis failed (${response.status}): ${message}`)
   }
 
   const data = await response.json()
