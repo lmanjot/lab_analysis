@@ -10,9 +10,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Missing contactid parameter' })
   }
 
-  const token = process.env.HUBSPOT_SECRET
+  const token = process.env.HUBSPOT_TOKEN || process.env.HUBSPOT_SECRET
   if (!token) {
-    return res.status(500).json({ error: 'HUBSPOT_SECRET not configured' })
+    return res.status(500).json({ error: 'HUBSPOT_TOKEN not configured' })
   }
 
   try {
