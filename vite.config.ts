@@ -9,7 +9,7 @@ export default defineConfig({
     // Vite only auto-exposes VITE_-prefixed vars, so we bridge them here.
     __GOAUTHID__: JSON.stringify(process.env.goauthid ?? ''),
     __GOAUTHSECRET__: JSON.stringify(process.env.goauthsecret ?? ''),
-    __GOPROJECTID__: JSON.stringify(process.env.goprojectid ?? ''),
-    __GOLOCATION__: JSON.stringify(process.env.golocation ?? ''),
+    __GOPROJECTID__: JSON.stringify(process.env.GOOGLE_CLOUD_PROJECT ?? process.env.goprojectid ?? ''),
+    __GOLOCATION__: JSON.stringify(process.env.VERTEX_LOCATION ?? process.env.golocation ?? ''),
   },
 })
