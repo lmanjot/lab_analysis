@@ -33,16 +33,9 @@
     "hubspotLoading": "Loading data from HubSpot..."
   },
   "patient": {
-    "title": "Patient Context (Optional)",
-    "age": "Age",
-    "sex": "Sex",
-    "sexMale": "Male",
-    "sexFemale": "Female",
-    "sexOther": "Other",
-    "weight": "Weight (kg)",
-    "height": "Height (cm)",
-    "conditions": "Known Conditions",
-    "conditionsPlaceholder": "e.g. Diabetes Type 2, Hypertension"
+    "title": "Medical Form Data",
+    "hint": "Patient medical history and questionnaire answers. Auto-populated from HubSpot when available.",
+    "placeholder": "e.g. Age: 35, Sex: Male, Known conditions, medications, allergies..."
   },
   "report": {
     "title": "Analysis Report",

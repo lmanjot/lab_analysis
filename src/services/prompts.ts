@@ -32,15 +32,9 @@ When interpreting values:
 - Provide actionable supplementation or lifestyle recommendations where appropriate.
 - Distinguish between androgenetic alopecia patterns and nutritional/telogen effluvium patterns based on the lab profile.`
 
-function buildPatientContextString(patient: PatientContext | null, lang: string): string {
-  if (!patient) return ''
-  const parts: string[] = []
-  if (patient.age) parts.push(lang === 'de' ? `Alter: ${patient.age}` : `Age: ${patient.age}`)
-  if (patient.sex) parts.push(lang === 'de' ? `Geschlecht: ${patient.sex}` : `Sex: ${patient.sex}`)
-  if (patient.weight) parts.push(lang === 'de' ? `Gewicht: ${patient.weight} kg` : `Weight: ${patient.weight} kg`)
-  if (patient.height) parts.push(lang === 'de' ? `Grösse: ${patient.height} cm` : `Height: ${patient.height} cm`)
-  if (patient.conditions) parts.push(lang === 'de' ? `Bekannte Erkrankungen: ${patient.conditions}` : `Known conditions: ${patient.conditions}`)
-  return parts.length > 0 ? `\nPatient context: ${parts.join(', ')}` : ''
+function buildPatientContextString(patient: PatientContext | null, _lang: string): string {
+  if (!patient?.medicalFormData) return ''
+  return `\n## Patient Medical Form Data:\n${patient.medicalFormData}`
 }
 
 const JSON_SCHEMA = `{

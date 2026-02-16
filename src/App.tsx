@@ -54,19 +54,11 @@ export default function App() {
           if (data.contactName) {
             setHubspotContactName(data.contactName)
           }
-          // Build patient context from HubSpot data
-          console.log('HubSpot data received:', {
-            age: data.age,
-            sex: data.sex,
-            medicalFormAnswers: data.medicalFormAnswers,
-            _debug: (data as unknown as Record<string, unknown>)._debug,
-          })
-          const ctx: PatientContext = {}
-          if (data.age) ctx.age = data.age
-          if (data.sex) ctx.sex = data.sex
+          // Build patient context from HubSpot medical form data
           const medicalText = formatMedicalAnswers(data.medicalFormAnswers || {})
-          if (medicalText) ctx.conditions = medicalText
-          setHubspotPatientCtx(ctx)
+          if (medicalText) {
+            setHubspotPatientCtx({ medicalFormData: medicalText })
+          }
         })
         .catch((err) => {
           setError(err instanceof Error ? err.message : 'Failed to load data from HubSpot')

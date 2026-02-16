@@ -24,8 +24,8 @@ export async function fetchHL7FromHubSpot(contactId: string): Promise<HubSpotCon
 }
 
 /**
- * Format medical form answers into a readable string for the conditions field.
- * Filters out empty values and formats as "Label: Value" lines.
+ * Format medical form answers into a readable string.
+ * Converts HubSpot internal field names to readable labels with proper spacing.
  */
 export function formatMedicalAnswers(answers: Record<string, string>): string {
   if (!answers || Object.keys(answers).length === 0) return ''
@@ -33,11 +33,18 @@ export function formatMedicalAnswers(answers: Record<string, string>): string {
   return Object.entries(answers)
     .filter(([, value]) => value && value.trim())
     .map(([key, value]) => {
-      // Convert HubSpot internal field names to readable labels
+      // Convert HubSpot internal field names (snake_case) to readable labels
       const label = key
-        .replace(/_/g, ' ')
+        .replace(/[_-]/g, ' ')
         .replace(/\b\w/g, (c) => c.toUpperCase())
-      return `${label}: ${value}`
+        .trim()
+
+      // Clean up semicolon-separated values (HubSpot checkboxes)
+      const cleanValue = value.includes(';')
+        ? value.split(';').map((v) => v.trim()).filter(Boolean).join(', ')
+        : value
+
+      return `${label}: ${cleanValue}`
     })
     .join('\n')
 }

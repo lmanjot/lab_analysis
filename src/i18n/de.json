@@ -33,16 +33,9 @@
     "hubspotLoading": "Daten werden von HubSpot geladen..."
   },
   "patient": {
-    "title": "Patientenkontext (Optional)",
-    "age": "Alter",
-    "sex": "Geschlecht",
-    "sexMale": "Männlich",
-    "sexFemale": "Weiblich",
-    "sexOther": "Andere",
-    "weight": "Gewicht (kg)",
-    "height": "Grösse (cm)",
-    "conditions": "Bekannte Erkrankungen",
-    "conditionsPlaceholder": "z.B. Diabetes Typ 2, Bluthochdruck"
+    "title": "Medizinische Formulardaten",
+    "hint": "Medizinische Anamnese und Fragebogen-Antworten. Wird automatisch aus HubSpot befüllt, wenn verfügbar.",
+    "placeholder": "z.B. Alter: 35, Geschlecht: Männlich, Bekannte Erkrankungen, Medikamente, Allergien..."
   },
   "report": {
     "title": "Analysebericht",

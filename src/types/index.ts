@@ -102,11 +102,7 @@ export interface ReferenceTableEntry {
 }
 
 export interface PatientContext {
-  age?: string
-  sex?: string
-  weight?: string
-  height?: string
-  conditions?: string
+  medicalFormData?: string
 }
 
 export interface ParsedRange {
