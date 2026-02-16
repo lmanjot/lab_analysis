@@ -2,6 +2,9 @@ export interface HubSpotContactData {
   hl7: string
   contactName: string
   contactId: string
+  age: string
+  sex: string
+  medicalFormAnswers: Record<string, string>
 }
 
 export function getContactIdFromURL(): string | null {
@@ -18,4 +21,23 @@ export async function fetchHL7FromHubSpot(contactId: string): Promise<HubSpotCon
   }
 
   return response.json()
+}
+
+/**
+ * Format medical form answers into a readable string for the conditions field.
+ * Filters out empty values and formats as "Label: Value" lines.
+ */
+export function formatMedicalAnswers(answers: Record<string, string>): string {
+  if (!answers || Object.keys(answers).length === 0) return ''
+
+  return Object.entries(answers)
+    .filter(([, value]) => value && value.trim())
+    .map(([key, value]) => {
+      // Convert HubSpot internal field names to readable labels
+      const label = key
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase())
+      return `${label}: ${value}`
+    })
+    .join('\n')
 }

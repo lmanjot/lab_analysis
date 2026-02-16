@@ -12,11 +12,12 @@ interface InputFormProps {
   onAnalyzePDF: (file: File, patientCtx: PatientContextType, customPrompt: string) => void
   preloadedHL7?: string
   hubspotContactName?: string
+  hubspotPatientCtx?: PatientContextType
 }
 
 type Tab = 'hl7' | 'pdf'
 
-export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedHL7, hubspotContactName }: InputFormProps) {
+export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedHL7, hubspotContactName, hubspotPatientCtx }: InputFormProps) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<Tab>('hl7')
   const [hl7Text, setHl7Text] = useState('')
@@ -30,14 +31,19 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedH
   const fileInputRef = useRef<HTMLInputElement>(null)
   const preloadApplied = useRef(false)
 
-  // Apply preloaded HL7 from HubSpot once
-  if (preloadedHL7 && !preloadApplied.current) {
+  // Apply preloaded HL7 and patient context from HubSpot once
+  if (!preloadApplied.current && (preloadedHL7 || hubspotPatientCtx)) {
     preloadApplied.current = true
-    setHl7Text(preloadedHL7)
-    try {
-      const parsed = parseHL7Message(preloadedHL7)
-      setParsedPreview(parsed)
-    } catch { /* ignore parse errors on preload */ }
+    if (preloadedHL7) {
+      setHl7Text(preloadedHL7)
+      try {
+        const parsed = parseHL7Message(preloadedHL7)
+        setParsedPreview(parsed)
+      } catch { /* ignore parse errors on preload */ }
+    }
+    if (hubspotPatientCtx) {
+      setPatientCtx((prev) => ({ ...prev, ...hubspotPatientCtx }))
+    }
   }
 
   const handleHL7Change = (text: string) => {

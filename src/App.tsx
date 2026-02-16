@@ -4,7 +4,7 @@ import { AuthState, AppView, ParsedHL7, PatientContext, GeminiReport, Patient } 
 import { initAuth, signIn, signOut, isTokenExpired, refreshToken, getAuthStatus } from './services/auth'
 import { analyzeWithGemini, fileToBase64 } from './services/gemini'
 import { buildHL7AnalysisPrompt, buildPDFAnalysisPrompt } from './services/prompts'
-import { getContactIdFromURL, fetchHL7FromHubSpot } from './services/hubspot'
+import { getContactIdFromURL, fetchHL7FromHubSpot, formatMedicalAnswers } from './services/hubspot'
 import Layout from './components/Layout'
 import InputForm from './components/InputForm'
 import AnalysisView from './components/AnalysisView'
@@ -26,6 +26,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
   const [preloadedHL7, setPreloadedHL7] = useState<string | undefined>()
   const [hubspotContactName, setHubspotContactName] = useState<string | undefined>()
+  const [hubspotPatientCtx, setHubspotPatientCtx] = useState<PatientContext | undefined>()
   const [hubspotLoading, setHubspotLoading] = useState(false)
 
   const [authConfigError, setAuthConfigError] = useState<string | null>(null)
@@ -52,6 +53,15 @@ export default function App() {
           }
           if (data.contactName) {
             setHubspotContactName(data.contactName)
+          }
+          // Build patient context from HubSpot data
+          const ctx: PatientContext = {}
+          if (data.age) ctx.age = data.age
+          if (data.sex) ctx.sex = data.sex
+          const medicalText = formatMedicalAnswers(data.medicalFormAnswers)
+          if (medicalText) ctx.conditions = medicalText
+          if (Object.keys(ctx).length > 0) {
+            setHubspotPatientCtx(ctx)
           }
         })
         .catch((err) => {
@@ -177,6 +187,7 @@ export default function App() {
           onAnalyzePDF={handleAnalyzePDF}
           preloadedHL7={preloadedHL7}
           hubspotContactName={hubspotContactName}
+          hubspotPatientCtx={hubspotPatientCtx}
         />
       )}
 
