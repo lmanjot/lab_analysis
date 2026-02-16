@@ -70,7 +70,17 @@ export default function Report({ report, patient, onNewAnalysis }: ReportProps) 
           </div>
         )}
 
-        {/* Interpretation (top) */}
+        {/* Summary */}
+        {report.summary && (
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              {t('report.summary')}
+            </h3>
+            <p className="text-sm text-gray-800 leading-relaxed">{report.summary}</p>
+          </div>
+        )}
+
+        {/* Interpretation */}
         {report.interpretation && (
           <div className="px-6 py-4 border-b border-gray-100">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
@@ -79,16 +89,6 @@ export default function Report({ report, patient, onNewAnalysis }: ReportProps) 
             <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
               {report.interpretation}
             </div>
-          </div>
-        )}
-
-        {/* Summary */}
-        {report.summary && (
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              {t('report.summary')}
-            </h3>
-            <p className="text-sm text-gray-800 leading-relaxed">{report.summary}</p>
           </div>
         )}
 

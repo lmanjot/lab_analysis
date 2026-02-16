@@ -4,6 +4,7 @@ import { AuthState, AppView, ParsedHL7, PatientContext, GeminiReport, Patient } 
 import { initAuth, signIn, signOut, isTokenExpired, refreshToken, getAuthStatus } from './services/auth'
 import { analyzeWithGemini, fileToBase64 } from './services/gemini'
 import { buildHL7AnalysisPrompt, buildPDFAnalysisPrompt } from './services/prompts'
+import { getContactIdFromURL, fetchHL7FromHubSpot } from './services/hubspot'
 import Layout from './components/Layout'
 import InputForm from './components/InputForm'
 import AnalysisView from './components/AnalysisView'
@@ -23,6 +24,9 @@ export default function App() {
   const [report, setReport] = useState<GeminiReport | null>(null)
   const [patient, setPatient] = useState<Patient | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [preloadedHL7, setPreloadedHL7] = useState<string | undefined>()
+  const [hubspotContactName, setHubspotContactName] = useState<string | undefined>()
+  const [hubspotLoading, setHubspotLoading] = useState(false)
 
   const [authConfigError, setAuthConfigError] = useState<string | null>(null)
 
@@ -33,6 +37,27 @@ export default function App() {
       setAuthConfigError(
         'Google OAuth is not configured.\n\nOn Vercel: set goauthid in Environment Variables.\nFor local dev: create a .env file with VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com\nThen restart the dev server.'
       )
+    }
+
+    // Fetch HL7 from HubSpot if contactid URL param is present
+    const contactId = getContactIdFromURL()
+    if (contactId) {
+      setHubspotLoading(true)
+      fetchHL7FromHubSpot(contactId)
+        .then((data) => {
+          if (data.hl7) {
+            setPreloadedHL7(data.hl7)
+          } else {
+            setError(`No HL7 data found for contact ${data.contactName || contactId}`)
+          }
+          if (data.contactName) {
+            setHubspotContactName(data.contactName)
+          }
+        })
+        .catch((err) => {
+          setError(err instanceof Error ? err.message : 'Failed to load data from HubSpot')
+        })
+        .finally(() => setHubspotLoading(false))
     }
   }, [])
 
@@ -139,8 +164,20 @@ export default function App() {
         </div>
       )}
 
-      {view === 'input' && (
-        <InputForm auth={auth} onAnalyzeHL7={handleAnalyzeHL7} onAnalyzePDF={handleAnalyzePDF} />
+      {hubspotLoading && (
+        <div className="mb-6 bg-gray-50 border border-gray-200 rounded-lg p-4 text-center print:hidden">
+          <p className="text-sm text-gray-600">{t('input.hubspotLoading')}</p>
+        </div>
+      )}
+
+      {view === 'input' && !hubspotLoading && (
+        <InputForm
+          auth={auth}
+          onAnalyzeHL7={handleAnalyzeHL7}
+          onAnalyzePDF={handleAnalyzePDF}
+          preloadedHL7={preloadedHL7}
+          hubspotContactName={hubspotContactName}
+        />
       )}
 
       {view === 'analyzing' && <AnalysisView />}

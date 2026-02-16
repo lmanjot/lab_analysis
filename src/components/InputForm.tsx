@@ -10,11 +10,13 @@ interface InputFormProps {
   auth: AuthState
   onAnalyzeHL7: (parsedData: ParsedHL7, rawHL7: string, patientCtx: PatientContextType, customPrompt: string) => void
   onAnalyzePDF: (file: File, patientCtx: PatientContextType, customPrompt: string) => void
+  preloadedHL7?: string
+  hubspotContactName?: string
 }
 
 type Tab = 'hl7' | 'pdf'
 
-export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF }: InputFormProps) {
+export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedHL7, hubspotContactName }: InputFormProps) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<Tab>('hl7')
   const [hl7Text, setHl7Text] = useState('')
@@ -22,9 +24,21 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF }: InputFor
   const [patientCtx, setPatientCtx] = useState<PatientContextType>({})
   const [customPrompt, setCustomPrompt] = useState(DEFAULT_CUSTOM_PROMPT)
   const [showPrompt, setShowPrompt] = useState(false)
+  const [showHL7Input, setShowHL7Input] = useState(!preloadedHL7)
   const [parsedPreview, setParsedPreview] = useState<ParsedHL7 | null>(null)
   const [parseError, setParseError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const preloadApplied = useRef(false)
+
+  // Apply preloaded HL7 from HubSpot once
+  if (preloadedHL7 && !preloadApplied.current) {
+    preloadApplied.current = true
+    setHl7Text(preloadedHL7)
+    try {
+      const parsed = parseHL7Message(preloadedHL7)
+      setParsedPreview(parsed)
+    } catch { /* ignore parse errors on preload */ }
+  }
 
   const handleHL7Change = (text: string) => {
     setHl7Text(text)
@@ -101,6 +115,23 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF }: InputFor
         </div>
       )}
 
+      {/* HubSpot banner */}
+      {preloadedHL7 && hubspotContactName && (
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 flex items-center gap-3">
+          <svg className="w-5 h-5 text-orange-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <div>
+            <p className="text-sm font-medium text-orange-800">
+              {t('input.hubspotLoaded', { name: hubspotContactName })}
+            </p>
+            <p className="text-xs text-orange-600 mt-0.5">
+              {t('input.hubspotHL7Chars', { count: preloadedHL7.length })}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         {/* Tabs */}
         <div className="flex border-b border-gray-200">
@@ -129,16 +160,35 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF }: InputFor
         <div className="p-5">
           {activeTab === 'hl7' ? (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('input.hl7Label')}
-              </label>
-              <textarea
-                value={hl7Text}
-                onChange={(e) => handleHL7Change(e.target.value)}
-                placeholder={t('input.hl7Placeholder')}
-                rows={12}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y"
-              />
+              {/* Collapsible header when preloaded from HubSpot */}
+              {preloadedHL7 && (
+                <button
+                  onClick={() => setShowHL7Input(!showHL7Input)}
+                  className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2 hover:text-gray-900"
+                >
+                  <svg
+                    className={`w-4 h-4 text-gray-400 transition-transform ${showHL7Input ? 'rotate-180' : ''}`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                  {t('input.hl7Label')}
+                </button>
+              )}
+              {!preloadedHL7 && (
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('input.hl7Label')}
+                </label>
+              )}
+              {showHL7Input && (
+                <textarea
+                  value={hl7Text}
+                  onChange={(e) => handleHL7Change(e.target.value)}
+                  placeholder={t('input.hl7Placeholder')}
+                  rows={12}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y"
+                />
+              )}
             </div>
           ) : (
             <div>

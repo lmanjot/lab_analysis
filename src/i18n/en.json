@@ -27,7 +27,10 @@
     "customPrompt": "AI Prompt",
     "customPromptHint": "Customize the instructions sent to Gemini. This tells the AI how to interpret the results.",
     "showPrompt": "Show AI Prompt",
-    "hidePrompt": "Hide AI Prompt"
+    "hidePrompt": "Hide AI Prompt",
+    "hubspotLoaded": "HL7 data loaded from HubSpot for {{name}}",
+    "hubspotHL7Chars": "{{count}} characters of HL7 data",
+    "hubspotLoading": "Loading data from HubSpot..."
   },
   "patient": {
     "title": "Patient Context (Optional)",

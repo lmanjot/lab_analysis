@@ -74,7 +74,15 @@ export default function ReportPanel({ panel }: ReportPanelProps) {
         <h4 className="text-sm font-semibold text-gray-800">{panel.name}</h4>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm table-fixed">
+          <colgroup>
+            <col className="w-[36%]" />
+            <col className="w-[10%]" />
+            <col className="w-[10%]" />
+            <col className="w-[14%]" />
+            <col className="w-[15%]" />
+            <col className="w-[15%]" />
+          </colgroup>
           <thead>
             <tr className="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
               <th className="text-left px-4 py-2 font-medium">{t('report.biomarker')}</th>

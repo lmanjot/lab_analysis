@@ -27,7 +27,10 @@
     "customPrompt": "KI-Prompt",
     "customPromptHint": "Passen Sie die Anweisungen an Gemini an. Dies steuert, wie die KI die Ergebnisse interpretiert.",
     "showPrompt": "KI-Prompt anzeigen",
-    "hidePrompt": "KI-Prompt ausblenden"
+    "hidePrompt": "KI-Prompt ausblenden",
+    "hubspotLoaded": "HL7-Daten von HubSpot geladen für {{name}}",
+    "hubspotHL7Chars": "{{count}} Zeichen HL7-Daten",
+    "hubspotLoading": "Daten werden von HubSpot geladen..."
   },
   "patient": {
     "title": "Patientenkontext (Optional)",
