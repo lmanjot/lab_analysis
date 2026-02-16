@@ -82,16 +82,6 @@ export default function Report({ report, patient, onNewAnalysis }: ReportProps) 
           </div>
         )}
 
-        {/* Summary */}
-        {report.summary && (
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              {t('report.summary')}
-            </h3>
-            <p className="text-sm text-gray-800 leading-relaxed">{report.summary}</p>
-          </div>
-        )}
-
         {/* Interpretation */}
         {report.interpretation && (
           <div className="px-6 py-4 border-b border-gray-100">
@@ -101,18 +91,6 @@ export default function Report({ report, patient, onNewAnalysis }: ReportProps) 
             <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
               {report.interpretation}
             </div>
-          </div>
-        )}
-
-        {/* Panels */}
-        {report.panels.length > 0 && (
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
-              {t('report.panels')}
-            </h3>
-            {report.panels.map((panel, i) => (
-              <ReportPanel key={i} panel={panel} />
-            ))}
           </div>
         )}
 
@@ -130,6 +108,18 @@ export default function Report({ report, patient, onNewAnalysis }: ReportProps) 
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {/* Panels */}
+        {report.panels.length > 0 && (
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+              {t('report.panels')}
+            </h3>
+            {report.panels.map((panel, i) => (
+              <ReportPanel key={i} panel={panel} />
+            ))}
           </div>
         )}
 
