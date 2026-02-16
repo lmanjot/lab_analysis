@@ -5,7 +5,7 @@ interface ParsePreviewProps {
   data: ParsedHL7
 }
 
-function statusBadge(status: string) {
+function statusBadge(status: string, t: (key: string) => string) {
   const colors: Record<string, string> = {
     normal: 'bg-green-100 text-green-700',
     below_idealrange: 'bg-yellow-100 text-yellow-700',
@@ -14,7 +14,11 @@ function statusBadge(status: string) {
     above_refrange: 'bg-red-100 text-red-700',
   }
   const className = colors[status] || 'bg-gray-100 text-gray-600'
-  const label = status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || '—'
+  const labelMap: Record<string, string> = {
+    above_idealrange: t('preview.statusSupraoptimal'),
+    below_idealrange: t('preview.statusSuboptimal'),
+  }
+  const label = labelMap[status] ?? (status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || '—')
   return (
     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${className}`}>
       {label}
@@ -75,7 +79,7 @@ export default function ParsePreview({ data }: ParsePreviewProps) {
                   <td className="px-5 py-2 text-right font-medium text-gray-900">{obs.value}</td>
                   <td className="px-5 py-2 text-gray-500">{obs.units || '—'}</td>
                   <td className="px-5 py-2 text-gray-500">{obs.refRange || '—'}</td>
-                  <td className="px-5 py-2">{statusBadge(obs.mara_status)}</td>
+                  <td className="px-5 py-2">{statusBadge(obs.mara_status, t)}</td>
                 </tr>
               ))}
             </tbody>

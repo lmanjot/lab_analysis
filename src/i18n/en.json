@@ -82,7 +82,9 @@
     "units": "Units",
     "refRange": "Ref. Range",
     "status": "Status",
-    "notes": "Notes"
+    "notes": "Notes",
+    "statusSupraoptimal": "Supraoptimal",
+    "statusSuboptimal": "Suboptimal"
   },
   "errors": {
     "parseError": "Failed to parse HL7 data. Please check the format.",

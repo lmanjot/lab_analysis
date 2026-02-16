@@ -82,7 +82,9 @@
     "units": "Einheit",
     "refRange": "Ref.-Bereich",
     "status": "Status",
-    "notes": "Notizen"
+    "notes": "Notizen",
+    "statusSupraoptimal": "Supraoptimal",
+    "statusSuboptimal": "Suboptimal"
   },
   "errors": {
     "parseError": "HL7-Daten konnten nicht verarbeitet werden. Bitte überprüfen Sie das Format.",

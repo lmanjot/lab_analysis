@@ -81,7 +81,20 @@ export function determineMaraStatus(observation: Observation): { status: MaraSta
     }
   }
 
-  // Check reference table for ideal range
+  // If we have a lab reference range, check medical (ref) range first.
+  // Only use ideal (hair) range when value is within lab ref — so we don't label medically normal values as ref-range abnormal.
+  if (labRefRange) {
+    const labRange = parseRange(labRefRange)
+    if (labRange && !isWithinRange(value, labRange)) {
+      // Outside medical reference range
+      if (value < labRange.min) {
+        return { status: 'below_refrange', range: null }
+      }
+      return { status: 'above_refrange', range: null }
+    }
+  }
+
+  // Check reference table for ideal (hair) range
   const referenceParam = findParameterInReferenceTable(parameterCode)
   if (referenceParam && referenceParam.ideal_range) {
     const idealRange = parseRange(referenceParam.ideal_range)
@@ -94,7 +107,9 @@ export function determineMaraStatus(observation: Observation): { status: MaraSta
         return { status: 'above_idealrange', range: referenceParam.ideal_range }
       }
     }
-  } else if (labRefRange) {
+  }
+
+  if (labRefRange) {
     const labRange = parseRange(labRefRange)
     if (labRange) {
       if (isWithinRange(value, labRange)) {
