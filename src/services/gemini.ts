@@ -26,6 +26,7 @@ interface GeminiPart {
 }
 
 interface GeminiContent {
+  role: 'user' | 'model'
   parts: GeminiPart[]
 }
 
@@ -56,7 +57,7 @@ export async function analyzeWithGemini(
   parts.push({ text: prompt })
 
   const requestBody: GeminiRequest = {
-    contents: [{ parts }],
+    contents: [{ role: 'user', parts }],
     generationConfig: {
       temperature: 0.3,
       maxOutputTokens: 8192,
