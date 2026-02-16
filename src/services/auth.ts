@@ -68,6 +68,31 @@ async function fetchUserInfo(accessToken: string): Promise<{ email: string; name
   return { email: data.email, name: data.name }
 }
 
+function loadGisScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (window.google?.accounts?.oauth2) {
+      resolve()
+      return
+    }
+    const script = document.createElement('script')
+    script.src = 'https://accounts.google.com/gsi/client'
+    script.async = true
+    script.defer = true
+    script.onload = () => {
+      const check = () => {
+        if (window.google?.accounts?.oauth2) {
+          resolve()
+        } else {
+          setTimeout(check, 100)
+        }
+      }
+      check()
+    }
+    script.onerror = () => reject(new Error('Failed to load Google Identity Services'))
+    document.head.appendChild(script)
+  })
+}
+
 export function initAuth(callback: (state: AuthState) => void): void {
   onAuthChange = callback
 
@@ -77,9 +102,9 @@ export function initAuth(callback: (state: AuthState) => void): void {
     return
   }
 
-  const checkGoogle = () => {
-    if (window.google?.accounts?.oauth2) {
-      tokenClient = window.google.accounts.oauth2.initTokenClient({
+  loadGisScript()
+    .then(() => {
+      tokenClient = window.google!.accounts.oauth2.initTokenClient({
         client_id: clientId,
         scope: SCOPES,
         callback: async (response: TokenResponse) => {
@@ -114,12 +139,10 @@ export function initAuth(callback: (state: AuthState) => void): void {
           console.error('OAuth error callback:', error)
         },
       })
-    } else {
-      setTimeout(checkGoogle, 200)
-    }
-  }
-
-  checkGoogle()
+    })
+    .catch((err) => {
+      console.error('Failed to initialize Google Auth:', err)
+    })
 }
 
 export function signIn(): void {
