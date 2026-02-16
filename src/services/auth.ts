@@ -41,6 +41,7 @@ let tokenClient: TokenClient | null = null
 let onAuthChange: ((state: AuthState) => void) | null = null
 let authInitError: string | null = null
 let authReady = false
+let lastEmail: string | null = null
 
 const SCOPES = [
   'https://www.googleapis.com/auth/generative-language',
@@ -133,6 +134,7 @@ export function initAuth(callback: (state: AuthState) => void): void {
 
           try {
             const userInfo = await fetchUserInfo(response.access_token)
+            lastEmail = userInfo.email
             const state: AuthState = {
               isSignedIn: true,
               accessToken: response.access_token,
@@ -175,12 +177,19 @@ export function signIn(): string | null {
   if (!tokenClient) {
     return 'Google sign-in is still loading. Please try again in a moment.'
   }
-  tokenClient.requestAccessToken({ prompt: 'consent' })
+  // 'select_account' forces the account picker so users can switch accounts
+  tokenClient.requestAccessToken({ prompt: 'select_account' })
   return null
 }
 
 export function signOut(): void {
   onAuthChange?.(createEmptyAuthState())
+  // Revoke the token so the next sign-in shows the account picker cleanly
+  if (window.google?.accounts?.id) {
+    try {
+      window.google.accounts.id.revoke(lastEmail || '', () => {})
+    } catch { /* ignore */ }
+  }
 }
 
 export function isTokenExpired(auth: AuthState): boolean {
