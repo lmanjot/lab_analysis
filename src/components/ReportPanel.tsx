@@ -1,40 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { GeminiReportPanel, HairStatus } from '../types'
+import { normalizeStatus, statusColor, statusLabel, isStatusAbnormal } from '../services/statusUtils'
 
 interface ReportPanelProps {
   panel: GeminiReportPanel
-}
-
-function medicalStatusColor(status: string): string {
-  switch (status) {
-    case 'normal':
-      return 'text-green-700 bg-green-50 border-green-200'
-    case 'low':
-    case 'critical_low':
-      return 'text-red-700 bg-red-50 border-red-200'
-    case 'high':
-    case 'critical_high':
-      return 'text-red-700 bg-red-50 border-red-200'
-    default:
-      return 'text-gray-600 bg-gray-50 border-gray-200'
-  }
-}
-
-function medicalStatusLabel(status: string, t: (key: string) => string): string {
-  switch (status) {
-    case 'normal':
-      return t('report.normal')
-    case 'low':
-      return t('report.low')
-    case 'high':
-      return t('report.high')
-    case 'critical_low':
-      return t('report.criticalLow')
-    case 'critical_high':
-      return t('report.criticalHigh')
-    default:
-      return status
-  }
 }
 
 function hairStatusColor(status: HairStatus): string {
@@ -63,10 +32,10 @@ function hairStatusLabel(status: HairStatus, t: (key: string) => string): string
   }
 }
 
-function isRowHighlight(status: string, hairStatus: HairStatus): boolean {
-  const medicalBad = status && status !== 'normal'
+function isRowHighlight(rawStatus: string, hairStatus: HairStatus): boolean {
+  const medicalBad = isStatusAbnormal(rawStatus)
   const hairBad = hairStatus === 'suboptimal' || hairStatus === 'concern'
-  return !!medicalBad || !!hairBad
+  return medicalBad || hairBad
 }
 
 export default function ReportPanel({ panel }: ReportPanelProps) {
@@ -100,6 +69,7 @@ export default function ReportPanel({ panel }: ReportPanelProps) {
           <tbody className="divide-y divide-gray-50">
             {panel.biomarkers.map((bio, i) => {
               const showHair = bio.hairStatus && bio.hairStatus !== 'not_relevant'
+              const normalized = normalizeStatus(bio.status)
               const highlight = isRowHighlight(bio.status, bio.hairStatus)
               return (
                 <tr
@@ -119,9 +89,9 @@ export default function ReportPanel({ panel }: ReportPanelProps) {
                   <td className="px-4 py-2 text-gray-500">{bio.refRange}</td>
                   <td className="px-4 py-2 text-center">
                     <span
-                      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium border ${medicalStatusColor(bio.status)}`}
+                      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium border ${statusColor(normalized)}`}
                     >
-                      {medicalStatusLabel(bio.status, t)}
+                      {statusLabel(normalized, t)}
                     </span>
                   </td>
                   <td className="px-4 py-2 text-center">

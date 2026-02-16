@@ -1,28 +1,17 @@
 import { useTranslation } from 'react-i18next'
 import { ParsedHL7 } from '../types'
+import { normalizeStatus, statusColor, statusLabel } from '../services/statusUtils'
 
 interface ParsePreviewProps {
   data: ParsedHL7
 }
 
-function statusBadge(status: string, t: (key: string) => string) {
-  const colors: Record<string, string> = {
-    normal: 'bg-green-100 text-green-700',
-    below_idealrange: 'bg-yellow-100 text-yellow-700',
-    above_idealrange: 'bg-yellow-100 text-yellow-700',
-    below_refrange: 'bg-red-100 text-red-700',
-    above_refrange: 'bg-red-100 text-red-700',
-  }
-  const className = colors[status] || 'bg-gray-100 text-gray-600'
-  const labelMap: Record<string, string> = {
-    above_idealrange: t('preview.statusSupraoptimal'),
-    below_idealrange: t('preview.statusSuboptimal'),
-    below_refrange: t('report.low'),
-    above_refrange: t('report.high'),
-  }
-  const label = labelMap[status] ?? (status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || '—')
+function statusBadge(rawStatus: string, t: (key: string) => string) {
+  const normalized = normalizeStatus(rawStatus)
+  const color = statusColor(normalized)
+  const label = normalized === 'unknown' ? (rawStatus || '—') : statusLabel(normalized, t)
   return (
-    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${className}`}>
+    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium border ${color}`}>
       {label}
     </span>
   )
