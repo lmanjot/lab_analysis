@@ -65,6 +65,12 @@ function hairStatusLabel(status: HairStatus, t: (key: string) => string): string
   }
 }
 
+function isRowHighlight(status: string, hairStatus: HairStatus): boolean {
+  const medicalBad = status && status !== 'normal'
+  const hairBad = hairStatus === 'suboptimal' || hairStatus === 'concern'
+  return !!medicalBad || !!hairBad
+}
+
 export default function ReportPanel({ panel }: ReportPanelProps) {
   const { t } = useTranslation()
 
@@ -96,8 +102,12 @@ export default function ReportPanel({ panel }: ReportPanelProps) {
           <tbody className="divide-y divide-gray-50">
             {panel.biomarkers.map((bio, i) => {
               const showHair = bio.hairStatus && bio.hairStatus !== 'not_relevant'
+              const highlight = isRowHighlight(bio.status, bio.hairStatus)
               return (
-                <tr key={i}>
+                <tr
+                  key={i}
+                  className={highlight ? 'bg-amber-50/80' : undefined}
+                >
                   <td className="px-4 py-2">
                     <div className="font-medium text-gray-900">{bio.name}</div>
                     {bio.interpretation && (
