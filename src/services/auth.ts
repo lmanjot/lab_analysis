@@ -43,10 +43,12 @@ let authInitError: string | null = null
 let authReady = false
 let lastEmail: string | null = null
 
-// The Generative Language API's generateContent endpoint doesn't require
-// special OAuth scopes -- a valid Google access token is sufficient when the
-// API is enabled in the Cloud project. We only request identity scopes.
-const SCOPES = 'openid email profile'
+const SCOPES = [
+  'https://www.googleapis.com/auth/cloud-platform',
+  'openid',
+  'email',
+  'profile',
+].join(' ')
 
 function createEmptyAuthState(): AuthState {
   return {
