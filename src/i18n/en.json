@@ -32,7 +32,9 @@
     "hubspotHL7Chars": "{{count}} characters of HL7 data",
     "hubspotLoading": "Loading data from HubSpot...",
     "noHL7Data": "No blood test data (HL7) found",
-    "debugSection": "Debug: data, medical form & prompt"
+    "debugSection": "Debug: data, medical form & prompt",
+    "sourceLabTest": "Source lab test",
+    "medicalQuestionnaire": "Medical questionnaire"
   },
   "patient": {
     "title": "Medical Form Data",

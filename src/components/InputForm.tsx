@@ -13,11 +13,13 @@ interface InputFormProps {
   preloadedHL7?: string
   hubspotContactName?: string
   hubspotPatientCtx?: PatientContextType
+  sourceLabTestUrl?: string
+  medicalQuestionnaireUrl?: string
 }
 
 type Tab = 'hl7' | 'pdf'
 
-export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedHL7, hubspotContactName, hubspotPatientCtx }: InputFormProps) {
+export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedHL7, hubspotContactName, hubspotPatientCtx, sourceLabTestUrl, medicalQuestionnaireUrl }: InputFormProps) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<Tab>('hl7')
   const [hl7Text, setHl7Text] = useState('')
@@ -126,6 +128,32 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedH
       {!auth.isSignedIn && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
           <p className="text-sm text-blue-800">{t('auth.signInRequired')}</p>
+        </div>
+      )}
+
+      {/* Contact source links (when HubSpot contact has URLs) */}
+      {(sourceLabTestUrl || medicalQuestionnaireUrl) && (
+        <div className="flex flex-wrap items-center gap-4 text-sm">
+          {sourceLabTestUrl && (
+            <a
+              href={sourceLabTestUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              {t('input.sourceLabTest')}
+            </a>
+          )}
+          {medicalQuestionnaireUrl && (
+            <a
+              href={medicalQuestionnaireUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              {t('input.medicalQuestionnaire')}
+            </a>
+          )}
         </div>
       )}
 

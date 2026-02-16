@@ -32,7 +32,9 @@
     "hubspotHL7Chars": "{{count}} Zeichen HL7-Daten",
     "hubspotLoading": "Daten werden von HubSpot geladen...",
     "noHL7Data": "Keine Blutbilddaten (HL7) gefunden",
-    "debugSection": "Debug: Daten, Anamnese & Prompt"
+    "debugSection": "Debug: Daten, Anamnese & Prompt",
+    "sourceLabTest": "Quell-Laborbefund",
+    "medicalQuestionnaire": "Medizinischer Fragebogen"
   },
   "patient": {
     "title": "Medizinische Formulardaten",

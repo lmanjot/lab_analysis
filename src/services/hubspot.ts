@@ -5,6 +5,8 @@ export interface HubSpotContactData {
   age: string
   sex: string
   medicalFormAnswers: Record<string, string>
+  sourceLabTestUrl?: string
+  medicalQuestionnaireUrl?: string
 }
 
 export function getContactIdFromURL(): string | null {

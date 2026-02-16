@@ -133,7 +133,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // 1. Fetch contact with extra properties
-    const contactUrl = `https://api.hubapi.com/crm/v3/objects/contacts/${encodeURIComponent(contactId)}?properties=blood_test_hl7,firstname,lastname,email,date_of_birth`
+    const contactUrl = `https://api.hubapi.com/crm/v3/objects/contacts/${encodeURIComponent(contactId)}?properties=blood_test_hl7,firstname,lastname,email,date_of_birth,blood_analysis__lab_,medical_lastquestionnaire`
     const contactResponse = await fetch(contactUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -157,6 +157,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const lastName = props.lastname || ''
     const email = props.email || ''
     const birthDate = props.date_of_birth || ''
+    const sourceLabTestUrl = (props.blood_analysis__lab_ || '').trim() || undefined
+    const medicalQuestionnaireUrl = (props.medical_lastquestionnaire || '').trim() || undefined
 
     // 2. Calculate age from birthdate
     const age = calculateAge(birthDate)
@@ -190,6 +192,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       age,
       sex,
       medicalFormAnswers,
+      sourceLabTestUrl,
+      medicalQuestionnaireUrl,
       _debug: {
         hasBirthDate: !!birthDate,
         birthDateRaw: birthDate,

@@ -79,6 +79,14 @@ ${patient.medicalFormData}
 IMPORTANT: Analyze this medical record carefully. Cross-reference the patient's self-reported conditions, medications, symptoms, and history with the lab results. In the "medicalRecordAnalysis" field of your response, provide a brief analysis of the medical record itself — summarize key findings from the questionnaire (age, sex, relevant conditions, medications, symptoms) and note how they may relate to the lab values and hair loss. This section should help the clinician quickly understand the patient profile before reading the lab interpretation.`
 }
 
+/** Output language follows the UI language at analysis launch: German (de/de-*) or English. */
+function getLanguageInstruction(lang: string): string {
+  const isGerman = typeof lang === 'string' && lang.toLowerCase().startsWith('de')
+  return isGerman
+    ? 'LANGUAGE: You must respond entirely in German (Deutsch). All sections, labels, and text in your JSON output must be in German.'
+    : 'LANGUAGE: You must respond entirely in English. All sections, labels, and text in your JSON output must be in English.'
+}
+
 const JSON_SCHEMA = `{
   "medicalRecordAnalysis": "Brief analysis of the patient's medical record/questionnaire — summarize the patient profile (age, sex, relevant conditions, medications, lifestyle factors, symptoms) and note how these may interact with the lab results and hair health. If no medical record was provided, set this to an empty string.",
   "generalHealth": "Section 1: General Health Assessment. Briefly identify any clinically significant systemic findings. If none, state: No clinically significant systemic abnormalities identified. No hair interpretation here.",
@@ -114,10 +122,7 @@ export function buildHL7AnalysisPrompt(
   lang: string,
   customPrompt: string
 ): string {
-  const langInstruction = lang === 'de'
-    ? 'Antworte vollständig auf Deutsch.'
-    : 'Respond entirely in English.'
-
+  const langInstruction = getLanguageInstruction(lang)
   const patientInfo = buildPatientContextString(patientContext, lang)
 
   const observationsSummary = parsedData.observations
@@ -154,10 +159,7 @@ export function buildPDFAnalysisPrompt(
   lang: string,
   customPrompt: string
 ): string {
-  const langInstruction = lang === 'de'
-    ? 'Antworte vollständig auf Deutsch.'
-    : 'Respond entirely in English.'
-
+  const langInstruction = getLanguageInstruction(lang)
   const patientInfo = buildPatientContextString(patientContext, lang)
 
   return `${customPrompt}

@@ -27,6 +27,8 @@ export default function App() {
   const [preloadedHL7, setPreloadedHL7] = useState<string | undefined>()
   const [hubspotContactName, setHubspotContactName] = useState<string | undefined>()
   const [hubspotPatientCtx, setHubspotPatientCtx] = useState<PatientContext | undefined>()
+  const [sourceLabTestUrl, setSourceLabTestUrl] = useState<string | undefined>()
+  const [medicalQuestionnaireUrl, setMedicalQuestionnaireUrl] = useState<string | undefined>()
   const [hubspotLoading, setHubspotLoading] = useState(false)
 
   const [authConfigError, setAuthConfigError] = useState<string | null>(null)
@@ -57,6 +59,8 @@ export default function App() {
         if (data.contactName) {
           setHubspotContactName(data.contactName)
         }
+        if (data.sourceLabTestUrl) setSourceLabTestUrl(data.sourceLabTestUrl)
+        if (data.medicalQuestionnaireUrl) setMedicalQuestionnaireUrl(data.medicalQuestionnaireUrl)
         // Build patient context from HubSpot medical form data
         const medicalText = formatMedicalAnswers(data.medicalFormAnswers || {})
         if (medicalText) {
@@ -91,6 +95,7 @@ export default function App() {
       setPatient(parsedData.patient)
 
       try {
+        // Analysis language follows UI language at launch (DE/EN toggle)
         const prompt = buildHL7AnalysisPrompt(parsedData, rawHL7, patientCtx, i18n.language, customPrompt)
         const result = await analyzeWithGemini(token, prompt)
         setReport(result)
@@ -122,6 +127,7 @@ export default function App() {
 
       try {
         const pdfBase64 = await fileToBase64(file)
+        // Analysis language follows UI language at launch (DE/EN toggle)
         const prompt = buildPDFAnalysisPrompt(patientCtx, i18n.language, customPrompt)
         const result = await analyzeWithGemini(token, prompt, pdfBase64)
         setReport(result)
@@ -186,6 +192,8 @@ export default function App() {
           preloadedHL7={preloadedHL7}
           hubspotContactName={hubspotContactName}
           hubspotPatientCtx={hubspotPatientCtx}
+          sourceLabTestUrl={sourceLabTestUrl}
+          medicalQuestionnaireUrl={medicalQuestionnaireUrl}
         />
       )}
 
