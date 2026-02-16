@@ -157,8 +157,8 @@ export default function InputForm({ auth, onAnalyzeHL7, onAnalyzePDF, preloadedH
         </div>
       )}
 
-      {/* Only show when HL7 tab and no data */}
-      {activeTab === 'hl7' && !hl7Text.trim() && (
+      {/* Only show when signed in, HL7 tab, and no data */}
+      {auth.isSignedIn && activeTab === 'hl7' && !hl7Text.trim() && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
           <p className="text-sm text-amber-800">{t('input.noHL7Data')}</p>
         </div>

@@ -10,11 +10,9 @@ function medicalStatusColor(status: string): string {
     case 'normal':
       return 'text-green-700 bg-green-50 border-green-200'
     case 'low':
-      return 'text-amber-700 bg-amber-50 border-amber-200'
-    case 'high':
-      return 'text-amber-700 bg-amber-50 border-amber-200'
     case 'critical_low':
       return 'text-red-700 bg-red-50 border-red-200'
+    case 'high':
     case 'critical_high':
       return 'text-red-700 bg-red-50 border-red-200'
     default:

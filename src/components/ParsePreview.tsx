@@ -17,6 +17,8 @@ function statusBadge(status: string, t: (key: string) => string) {
   const labelMap: Record<string, string> = {
     above_idealrange: t('preview.statusSupraoptimal'),
     below_idealrange: t('preview.statusSuboptimal'),
+    below_refrange: t('report.low'),
+    above_refrange: t('report.high'),
   }
   const label = labelMap[status] ?? (status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || '—')
   return (
