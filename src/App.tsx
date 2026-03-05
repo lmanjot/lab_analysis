@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AuthState, AppView, ParsedHL7, PatientContext, GeminiReport, Patient } from './types'
 import { initAuth, signIn, signOut, isTokenExpired, refreshToken, getAuthStatus } from './services/auth'
 import { analyzeWithGemini, fileToBase64 } from './services/gemini'
-import { buildHL7AnalysisPrompt, buildPDFAnalysisPrompt } from './services/prompts'
+import { buildHL7AnalysisPrompt, buildPDFAnalysisPrompt, DEFAULT_CUSTOM_PROMPT } from './services/prompts'
 import { getContactIdFromURL, fetchHL7FromHubSpot, formatMedicalAnswers } from './services/hubspot'
+import { parseHL7Message } from './services/hl7'
 import Layout from './components/Layout'
 import InputForm from './components/InputForm'
 import AnalysisView from './components/AnalysisView'
@@ -30,6 +31,8 @@ export default function App() {
   const [sourceLabTestUrl, setSourceLabTestUrl] = useState<string | undefined>()
   const [medicalQuestionnaireUrl, setMedicalQuestionnaireUrl] = useState<string | undefined>()
   const [hubspotLoading, setHubspotLoading] = useState(false)
+  const autoAnalyze = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('autoanalyze') === 'true'
+  const autoAnalyzeTriggered = useRef(false)
 
   const [authConfigError, setAuthConfigError] = useState<string | null>(null)
 
@@ -144,6 +147,19 @@ export default function App() {
     },
     [ensureValidToken, i18n.language, t]
   )
+
+  useEffect(() => {
+    if (!autoAnalyze || autoAnalyzeTriggered.current) return
+    if (!auth.isSignedIn || hubspotLoading || !preloadedHL7) return
+
+    autoAnalyzeTriggered.current = true
+    try {
+      const parsed = parseHL7Message(preloadedHL7)
+      handleAnalyzeHL7(parsed, preloadedHL7, hubspotPatientCtx || {}, DEFAULT_CUSTOM_PROMPT)
+    } catch {
+      setError('Auto-analysis failed: could not parse HL7 data')
+    }
+  }, [autoAnalyze, auth.isSignedIn, hubspotLoading, preloadedHL7, hubspotPatientCtx, handleAnalyzeHL7])
 
   const handleNewAnalysis = () => {
     setView('input')
